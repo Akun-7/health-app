@@ -1,3 +1,5 @@
-# Expo HAS CHANGED
+# Expo SDK version
 
-Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing any code.
+Проект SDK 54'кө түшүрүлгөн (2026-07-25, `expo@~54.0.36`) — телефондогу Expo Go колдонуучунун түзмөгүндө SDK 57'ни колдогон эмес, SDK 54 гана болгон. Код жазаардын алдында так версияланган документтерди текшер: https://docs.expo.dev/versions/v54.0.0/
+
+`expo-notifications`, `react-native`, `react-native-screens` ж.б. пакеттердин версиялары `npx expo install --fix` менен SDK 54'кө шайкеш тартылды — жаны пакет кошсоңуз да ушул команданы кайра иштет.

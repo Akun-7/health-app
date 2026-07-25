@@ -15,7 +15,7 @@
 
 ## Тех стек (иш жүзүндө колдонулуп жаткан)
 
-- **Mobile:** Expo SDK ~57, React Native 0.86, React 19.2, TypeScript
+- **Mobile:** Expo SDK ~54 (2026-07-25'тен баштап; мурун 57 эле, физикалык түзмөктөгү Expo Go'нун SDK 54'кө чейин гана колдогонуна байланыштуу түшүрүлдү), React Native 0.81, React 19.1, TypeScript
 - **Навигация:** `@react-navigation/native` + `native-stack` (v7) — бир гана `RootNavigator` (`src/navigation/RootNavigator.tsx`), stack ичинде экрандар: Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Reminders, AddReminder, Settings
 - **State/сактоо:** React Context (`createContext`/`useContext`) ар бир домен үчүн өзүнчө provider, дайыма `@react-native-async-storage/async-storage` менен персистенттелет:
   - `MeasurementsContext` → `health-app/measurements`
@@ -30,7 +30,7 @@
 - **Дизайн токендер:** `src/theme/` — `colors.ts` (light/dark), `typography.ts`, `spacing.ts`, `radii.ts`, баары `ThemeProvider.tsx` аркылуу `useTheme()` менен колдонулат
 - **Backend жок** — API, Express, auth сервер, база азырынча долбоордо жок
 
-⚠️ **Маанилуу:** `AGENTS.md`де айтылгандай, Expo версиясы (57) жакында олуттуу өзгөргөн. Код жазаардын алдында https://docs.expo.dev/versions/v57.0.0/ так текшерүү керек — эски версиянын API'син божомолдоо менен колдонбоо.
+⚠️ **Маанилуу:** `AGENTS.md`де айтылгандай, долбоор SDK 54'кө түшүрүлгөн (Expo Go'нун телефондогу колдоо чегине жараша). Код жазаардын алдында так версияланган документти текшер: https://docs.expo.dev/versions/v54.0.0/
 
 ## Папка структурасы (иш жүзүндөгү)
 
