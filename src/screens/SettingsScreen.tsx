@@ -6,11 +6,13 @@ import {
   IconLogout,
   IconUser,
   IconPencil,
+  IconAlertTriangle,
 } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import Button from '../components/Button';
 import ThemeModeSelector from '../components/ThemeModeSelector';
 import LanguageSelector from '../components/LanguageSelector';
+import SettingsLinkRow from '../components/SettingsLinkRow';
 import { useSettings } from '../context/SettingsContext';
 import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
@@ -114,6 +116,15 @@ export default function SettingsScreen({ navigation }: Props) {
           </View>
           <IconPencil size={sizes.iconInline} color={colors.textMuted} />
         </Pressable>
+      </View>
+
+      <View style={{ gap: spacing.sm }}>
+        <Text style={{ ...typography.caption, color: colors.textSecondary }}>{t('sos.title')}</Text>
+        <SettingsLinkRow
+          icon={<IconAlertTriangle size={sizes.iconDecorative} color={colors.primary} />}
+          title={t('emergencyContacts.title')}
+          onPress={() => navigation.navigate('EmergencyContacts')}
+        />
       </View>
 
       <View style={{ gap: spacing.sm }}>

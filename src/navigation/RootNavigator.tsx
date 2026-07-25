@@ -14,6 +14,9 @@ import InsightsScreen from '../screens/InsightsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
 import AddReminderScreen from '../screens/AddReminderScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import SOSScreen from '../screens/SOSScreen';
+import EmergencyContactsScreen from '../screens/EmergencyContactsScreen';
+import AddEmergencyContactScreen from '../screens/AddEmergencyContactScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -26,6 +29,9 @@ export type RootStackParamList = {
   Reminders: undefined;
   AddReminder: undefined;
   Settings: undefined;
+  SOS: undefined;
+  EmergencyContacts: undefined;
+  AddEmergencyContact: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -71,6 +77,9 @@ export default function RootNavigator() {
         <Stack.Screen name="Reminders" component={RemindersScreen} />
         <Stack.Screen name="AddReminder" component={AddReminderScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="SOS" component={SOSScreen} />
+        <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
+        <Stack.Screen name="AddEmergencyContact" component={AddEmergencyContactScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

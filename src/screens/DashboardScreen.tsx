@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Pressable } from 'react-native';
-import { IconHistory, IconChartLine, IconBell, IconSettings } from '@tabler/icons-react-native';
+import { IconHistory, IconChartLine, IconBell, IconSettings, IconAlertTriangle } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import VitalCard from '../components/VitalCard';
 import Button from '../components/Button';
@@ -47,22 +47,40 @@ export default function DashboardScreen({ navigation }: Props) {
           <Text style={{ ...typography.h1, color: colors.textPrimary }}>{t('dashboard.greeting')}</Text>
           <Text style={{ ...typography.body, color: colors.textSecondary }}>{t('dashboard.subtitle')}</Text>
         </View>
-        <Pressable
-          onPress={() => navigation.navigate('Settings')}
-          hitSlop={8}
-          style={{
-            width: sizes.tapTargetMin,
-            height: sizes.tapTargetMin,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: radii.round,
-            backgroundColor: colors.surface,
-            borderWidth: 1,
-            borderColor: colors.border,
-          }}
-        >
-          <IconSettings size={sizes.iconDecorative} color={colors.textPrimary} />
-        </Pressable>
+        <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+          <Pressable
+            onPress={() => navigation.navigate('SOS')}
+            hitSlop={8}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.xs,
+              height: sizes.tapTargetMin,
+              paddingHorizontal: spacing.md,
+              borderRadius: radii.round,
+              backgroundColor: colors.dangerBg,
+            }}
+          >
+            <IconAlertTriangle size={sizes.iconInline} color={colors.danger} />
+            <Text style={{ ...typography.caption, color: colors.danger }}>{t('quickLink.sos')}</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => navigation.navigate('Settings')}
+            hitSlop={8}
+            style={{
+              width: sizes.tapTargetMin,
+              height: sizes.tapTargetMin,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: radii.round,
+              backgroundColor: colors.surface,
+              borderWidth: 1,
+              borderColor: colors.border,
+            }}
+          >
+            <IconSettings size={sizes.iconDecorative} color={colors.textPrimary} />
+          </Pressable>
+        </View>
       </View>
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>

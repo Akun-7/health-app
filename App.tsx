@@ -6,6 +6,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import { ProfileProvider } from './src/context/ProfileContext';
 import { MeasurementsProvider } from './src/context/MeasurementsContext';
 import { RemindersProvider } from './src/context/RemindersContext';
+import { EmergencyContactsProvider } from './src/context/EmergencyContactsContext';
 import RootNavigator from './src/navigation/RootNavigator';
 
 export default function App() {
@@ -17,8 +18,10 @@ export default function App() {
             <ProfileProvider>
               <MeasurementsProvider>
                 <RemindersProvider>
-                  <RootNavigator />
-                  <StatusBar style="auto" />
+                  <EmergencyContactsProvider>
+                    <RootNavigator />
+                    <StatusBar style="auto" />
+                  </EmergencyContactsProvider>
                 </RemindersProvider>
               </MeasurementsProvider>
             </ProfileProvider>
