@@ -17,10 +17,14 @@ export const en: Record<TranslationKey, string> = {
 
   'signup.title': 'Create account',
   'signup.subtitle': 'Sign up to track your health',
-  'signup.nameLabel': 'Full name',
-  'signup.namePlaceholder': 'Jane Doe',
   'signup.submit': 'Sign up',
   'signup.haveAccount': 'I already have an account',
+
+  'auth.invalidEmail': 'Invalid email address',
+  'auth.invalidPassword': 'Password must be at least 6 characters',
+  'auth.emailTaken': 'An account with this email already exists',
+  'auth.invalidCredentials': 'Incorrect email or password',
+  'auth.networkError': "Couldn't reach the server. Check that it's running.",
 
   'profileSetup.titleCreate': 'Set up your profile',
   'profileSetup.titleEdit': 'Edit profile',

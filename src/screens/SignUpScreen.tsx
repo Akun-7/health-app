@@ -4,6 +4,9 @@ import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
 import { useLocale } from '../context/LocaleContext';
+import { useAuth } from '../context/AuthContext';
+import { ApiError } from '../api/client';
+import { apiErrorKey } from '../api/errors';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
@@ -12,23 +15,27 @@ type Props = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 export default function SignUpScreen({ navigation }: Props) {
   const { colors, typography, spacing } = useTheme();
   const { t } = useLocale();
-  const [name, setName] = useState('');
+  const { signup } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  function handleSignUp() {
-    if (!name || !email || !password) {
+  async function handleSignUp() {
+    if (!email || !password) {
       setError(t('common.fillAllFields'));
       return;
     }
     setError('');
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await signup(email.trim(), password);
       navigation.reset({ index: 0, routes: [{ name: 'ProfileSetup' }] });
-    }, 800);
+    } catch (err) {
+      setError(err instanceof ApiError ? t(apiErrorKey[err.code]) : t('auth.networkError'));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -44,12 +51,6 @@ export default function SignUpScreen({ navigation }: Props) {
           </View>
 
           <View style={{ gap: spacing.md }}>
-            <TextField
-              label={t('signup.nameLabel')}
-              placeholder={t('signup.namePlaceholder')}
-              value={name}
-              onChangeText={setName}
-            />
             <TextField
               label={t('common.email')}
               placeholder={t('common.emailPlaceholder')}

@@ -4,6 +4,10 @@ import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
 import { useLocale } from '../context/LocaleContext';
+import { useAuth } from '../context/AuthContext';
+import { useProfile } from '../context/ProfileContext';
+import { ApiError } from '../api/client';
+import { apiErrorKey } from '../api/errors';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
@@ -12,22 +16,28 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export default function LoginScreen({ navigation }: Props) {
   const { colors, typography, spacing } = useTheme();
   const { t } = useLocale();
+  const { login } = useAuth();
+  const { profile } = useProfile();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  function handleLogin() {
+  async function handleLogin() {
     if (!email || !password) {
       setError(t('login.errorRequired'));
       return;
     }
     setError('');
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await login(email.trim(), password);
+      navigation.reset({ index: 0, routes: [{ name: profile ? 'Dashboard' : 'ProfileSetup' }] });
+    } catch (err) {
+      setError(err instanceof ApiError ? t(apiErrorKey[err.code]) : t('auth.networkError'));
+    } finally {
       setLoading(false);
-      navigation.reset({ index: 0, routes: [{ name: 'ProfileSetup' }] });
-    }, 800);
+    }
   }
 
   return (

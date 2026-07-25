@@ -16,10 +16,14 @@ export const ky = {
 
   'signup.title': 'Аккаунт түзүү',
   'signup.subtitle': 'Ден соолугуңузду көзөмөлдөө үчүн катталыңыз',
-  'signup.nameLabel': 'Аты-жөнү',
-  'signup.namePlaceholder': 'Айым Акимова',
   'signup.submit': 'Катталуу',
   'signup.haveAccount': 'Аккаунтум бар',
+
+  'auth.invalidEmail': 'Email туура эмес',
+  'auth.invalidPassword': 'Сырсөз кеминде 6 белгиден турушу керек',
+  'auth.emailTaken': 'Бул email менен аккаунт мурунтан бар',
+  'auth.invalidCredentials': 'Email же сырсөз туура эмес',
+  'auth.networkError': 'Серверге туташуу мүмкүн болбоду. Сервер иштеп жатабы текшериңиз.',
 
   'profileSetup.titleCreate': 'Профилиңизди түзүңүз',
   'profileSetup.titleEdit': 'Профилди түзөтүү',

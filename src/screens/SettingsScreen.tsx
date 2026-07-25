@@ -15,6 +15,7 @@ import { useSettings } from '../context/SettingsContext';
 import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
 import { useProfile } from '../context/ProfileContext';
+import { useAuth } from '../context/AuthContext';
 import { useMeasurements } from '../context/MeasurementsContext';
 import { useReminders } from '../context/RemindersContext';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -27,6 +28,7 @@ export default function SettingsScreen({ navigation }: Props) {
   const { settings, setThemeMode } = useSettings();
   const { locale, setLocale, t } = useLocale();
   const { profile } = useProfile();
+  const { logout } = useAuth();
   const { clearAll: clearMeasurements } = useMeasurements();
   const { clearAll: clearReminders } = useReminders();
   const [confirmingClear, setConfirmingClear] = useState(false);
@@ -39,7 +41,8 @@ export default function SettingsScreen({ navigation }: Props) {
     setConfirmingClear(false);
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    await logout();
     navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
   }
 

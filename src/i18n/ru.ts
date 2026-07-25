@@ -17,10 +17,14 @@ export const ru: Record<TranslationKey, string> = {
 
   'signup.title': 'Создать аккаунт',
   'signup.subtitle': 'Зарегистрируйтесь, чтобы следить за здоровьем',
-  'signup.nameLabel': 'Имя и фамилия',
-  'signup.namePlaceholder': 'Мария Иванова',
   'signup.submit': 'Зарегистрироваться',
   'signup.haveAccount': 'У меня есть аккаунт',
+
+  'auth.invalidEmail': 'Некорректный email',
+  'auth.invalidPassword': 'Пароль должен быть не короче 6 символов',
+  'auth.emailTaken': 'Аккаунт с таким email уже существует',
+  'auth.invalidCredentials': 'Неверный email или пароль',
+  'auth.networkError': 'Не удалось подключиться к серверу. Проверьте, запущен ли сервер.',
 
   'profileSetup.titleCreate': 'Заполните профиль',
   'profileSetup.titleEdit': 'Изменить профиль',
