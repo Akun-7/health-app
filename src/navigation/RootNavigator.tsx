@@ -1,0 +1,62 @@
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTheme } from '../theme';
+import LoginScreen from '../screens/LoginScreen';
+import SignUpScreen from '../screens/SignUpScreen';
+import ProfileSetupScreen from '../screens/ProfileSetupScreen';
+import DashboardScreen from '../screens/DashboardScreen';
+import AddMeasurementScreen from '../screens/AddMeasurementScreen';
+import HistoryScreen from '../screens/HistoryScreen';
+import InsightsScreen from '../screens/InsightsScreen';
+import RemindersScreen from '../screens/RemindersScreen';
+import AddReminderScreen from '../screens/AddReminderScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+
+export type RootStackParamList = {
+  Login: undefined;
+  SignUp: undefined;
+  ProfileSetup: { mode?: 'edit' } | undefined;
+  Dashboard: undefined;
+  AddMeasurement: undefined;
+  History: undefined;
+  Insights: undefined;
+  Reminders: undefined;
+  AddReminder: undefined;
+  Settings: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+export default function RootNavigator() {
+  const theme = useTheme();
+  const navTheme = theme.scheme === 'dark' ? DarkTheme : DefaultTheme;
+
+  return (
+    <NavigationContainer
+      theme={{
+        ...navTheme,
+        colors: {
+          ...navTheme.colors,
+          background: theme.colors.pageBackground,
+          card: theme.colors.surface,
+          text: theme.colors.textPrimary,
+          border: theme.colors.border,
+          primary: theme.colors.primary,
+        },
+      }}
+    >
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+        <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        <Stack.Screen name="AddMeasurement" component={AddMeasurementScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+        <Stack.Screen name="Insights" component={InsightsScreen} />
+        <Stack.Screen name="Reminders" component={RemindersScreen} />
+        <Stack.Screen name="AddReminder" component={AddReminderScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
