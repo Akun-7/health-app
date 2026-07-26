@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Pressable } from 'react-native';
-import { IconHistory, IconChartLine, IconBell, IconSettings, IconAlertTriangle, IconStethoscope } from '@tabler/icons-react-native';
+import { IconHistory, IconChartLine, IconBell, IconSettings, IconAlertTriangle, IconStethoscope, IconWalk } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import VitalCard from '../components/VitalCard';
 import Button from '../components/Button';
@@ -8,6 +8,7 @@ import MedicalDisclaimer from '../components/MedicalDisclaimer';
 import { measurementMeta, formatMeasurementValue } from '../data/measurements';
 import type { MeasurementType } from '../data/measurements';
 import { useMeasurements } from '../context/MeasurementsContext';
+import { useSteps } from '../context/StepsContext';
 import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -20,6 +21,7 @@ const vitalTypes: MeasurementType[] = ['bloodPressure', 'pulse', 'spo2'];
 export default function DashboardScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
   const { measurements } = useMeasurements();
+  const { available: stepsAvailable, steps } = useSteps();
   const { t } = useLocale();
 
   function latestFor(type: MeasurementType) {
@@ -98,6 +100,14 @@ export default function DashboardScreen({ navigation }: Props) {
             />
           );
         })}
+        {stepsAvailable ? (
+          <VitalCard
+            icon={<IconWalk size={sizes.iconInline} color={colors.primary} />}
+            label={t('steps.title')}
+            value={String(steps)}
+            tone="success"
+          />
+        ) : null}
       </View>
 
       <Button

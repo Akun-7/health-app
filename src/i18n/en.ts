@@ -93,6 +93,24 @@ export const en: Record<TranslationKey, string> = {
   'bluetooth.disconnect': 'Disconnect',
   'bluetooth.saved': 'Saved',
 
+  'steps.title': 'Steps',
+
+  'sleep.title': 'Sleep',
+  'sleep.disclaimer': "Experimental: if the phone stays still for over 3 hours, it's automatically counted as sleep, but background execution is limited by the OS and doesn't run on a fixed schedule — results may be inaccurate.",
+  'sleep.checkNow': 'Check now',
+  'sleep.checking': 'Measuring (2s)...',
+  'sleep.lastSession': 'Last detected sleep',
+  'sleep.duration': '{hours}h {minutes}m',
+  'sleep.noSessions': 'No sleep detected yet.',
+  'sleep.recentSessions': 'Recent entries',
+  'sleep.currentlyStill': 'Right now: still',
+  'sleep.currentlyMoving': 'Right now: moving',
+  'sleep.unsupported': "Doesn't work on web — a device is needed.",
+
+  'alert.title': 'Concerning reading!',
+  'alert.body': '{label}: {value}. {advice}',
+  'alert.channelName': 'Alerts',
+
   'insights.empty': 'Not enough data for analysis yet. Add a few measurements.',
   'insights.status.good': 'Normal',
   'insights.status.watch': 'Worth watching',
@@ -150,6 +168,9 @@ export const en: Record<TranslationKey, string> = {
   'reminder.errorTitleRequired': 'Enter a title',
   'reminder.errorTimeInvalid': 'Enter time in HH:MM format (e.g. 08:00)',
   'reminder.channelName': 'Reminders',
+  'reminder.taken': 'Done',
+  'reminder.skip': 'Skip',
+  'reminder.weeklyStats': 'This week: {taken}/{total}',
 
   'settings.profileSection': 'Profile',
   'settings.profileSummary': '{gender}, {age} years old',

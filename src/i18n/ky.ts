@@ -92,6 +92,24 @@ export const ky = {
   'bluetooth.disconnect': 'Ажыратуу',
   'bluetooth.saved': 'Сакталды',
 
+  'steps.title': 'Кадам',
+
+  'sleep.title': 'Уйку',
+  'sleep.disclaimer': 'Экспериментал функция: телефон 3 сааттан ашык кыймылсыз жатканда уйку катары автоматтык аныкталат, бирок фондук иштетүү OS тарабынан чектелген жана так убакытта иштебейт — натыйжа так эмес болушу мүмкүн.',
+  'sleep.checkNow': 'Азыр текшерүү',
+  'sleep.checking': 'Өлчөнүүдө (2 сек)...',
+  'sleep.lastSession': 'Акыркы аныкталган уйку',
+  'sleep.duration': '{hours}с {minutes}мүн',
+  'sleep.noSessions': 'Азырынча эч кандай уйку аныкталган жок.',
+  'sleep.recentSessions': 'Акыркы жазуулар',
+  'sleep.currentlyStill': 'Учурда: кыймылсыз',
+  'sleep.currentlyMoving': 'Учурда: кыймылда',
+  'sleep.unsupported': 'Бул веб-версияда иштебейт — native түзмөк керек.',
+
+  'alert.title': 'Коркунучтуу көрсөткүч!',
+  'alert.body': '{label}: {value}. {advice}',
+  'alert.channelName': 'Эскертүүлөр',
+
   'insights.empty': 'Талдоо жасоо үчүн жетиштүү маалымат жок. Бир нече өлчөө кошуңуз.',
   'insights.status.good': 'Калыпта',
   'insights.status.watch': 'Байкоо керек',
@@ -149,6 +167,9 @@ export const ky = {
   'reminder.errorTitleRequired': 'Аталышын киргизиңиз',
   'reminder.errorTimeInvalid': 'Убакытты ЧЧ:ММ форматында киргизиңиз (мис. 08:00)',
   'reminder.channelName': 'Эскертмелер',
+  'reminder.taken': 'Аткардым',
+  'reminder.skip': 'Өткөрүп жиберди',
+  'reminder.weeklyStats': 'Бул жумада: {taken}/{total}',
 
   'settings.profileSection': 'Профиль',
   'settings.profileSummary': '{gender}, {age} жаш',

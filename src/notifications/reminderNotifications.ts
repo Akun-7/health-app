@@ -24,6 +24,20 @@ async function ensureAndroidChannel(channelName: string) {
   });
 }
 
+const ADHERENCE_CATEGORY = 'reminder-adherence';
+let adherenceCategoryConfigured = false;
+
+// Lets the user tap "Taken"/"Skip" directly on the notification, without
+// opening the app. Only needs configuring once per app session.
+export async function configureAdherenceCategory(takenLabel: string, skipLabel: string) {
+  if (Platform.OS === 'web' || adherenceCategoryConfigured) return;
+  adherenceCategoryConfigured = true;
+  await Notifications.setNotificationCategoryAsync(ADHERENCE_CATEGORY, [
+    { identifier: 'taken', buttonTitle: takenLabel, options: { opensAppToForeground: false } },
+    { identifier: 'skip', buttonTitle: skipLabel, options: { opensAppToForeground: false } },
+  ]);
+}
+
 export type ReminderPermissionStatus = 'granted' | 'denied' | 'undetermined' | 'unsupported';
 
 export async function getReminderPermissionStatus(): Promise<ReminderPermissionStatus> {
@@ -42,7 +56,7 @@ export async function requestReminderPermissions(channelName: string): Promise<b
 }
 
 export async function scheduleReminderNotification(
-  reminder: { title: string; time: string },
+  reminder: { id: string; title: string; time: string },
   labels: { categoryLabel: string; channelName: string }
 ): Promise<string | null> {
   if (Platform.OS === 'web') return null;
@@ -57,6 +71,8 @@ export async function scheduleReminderNotification(
     content: {
       title: reminder.title || labels.categoryLabel,
       body: labels.categoryLabel,
+      data: { reminderId: reminder.id },
+      categoryIdentifier: ADHERENCE_CATEGORY,
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,

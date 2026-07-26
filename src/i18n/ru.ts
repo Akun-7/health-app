@@ -93,6 +93,24 @@ export const ru: Record<TranslationKey, string> = {
   'bluetooth.disconnect': 'Отключить',
   'bluetooth.saved': 'Сохранено',
 
+  'steps.title': 'Шаги',
+
+  'sleep.title': 'Сон',
+  'sleep.disclaimer': 'Экспериментальная функция: если телефон неподвижен более 3 часов, это автоматически засчитывается как сон, но фоновое выполнение ограничено системой и работает не по расписанию — результат может быть неточным.',
+  'sleep.checkNow': 'Проверить сейчас',
+  'sleep.checking': 'Измеряем (2 сек)...',
+  'sleep.lastSession': 'Последний обнаруженный сон',
+  'sleep.duration': '{hours}ч {minutes}мин',
+  'sleep.noSessions': 'Сон пока не обнаружен.',
+  'sleep.recentSessions': 'Последние записи',
+  'sleep.currentlyStill': 'Сейчас: неподвижен',
+  'sleep.currentlyMoving': 'Сейчас: в движении',
+  'sleep.unsupported': 'Не работает в веб-версии — нужно устройство.',
+
+  'alert.title': 'Тревожный показатель!',
+  'alert.body': '{label}: {value}. {advice}',
+  'alert.channelName': 'Оповещения',
+
   'insights.empty': 'Недостаточно данных для анализа. Добавьте несколько измерений.',
   'insights.status.good': 'В норме',
   'insights.status.watch': 'Стоит понаблюдать',
@@ -150,6 +168,9 @@ export const ru: Record<TranslationKey, string> = {
   'reminder.errorTitleRequired': 'Введите название',
   'reminder.errorTimeInvalid': 'Введите время в формате ЧЧ:ММ (напр. 08:00)',
   'reminder.channelName': 'Напоминания',
+  'reminder.taken': 'Выполнено',
+  'reminder.skip': 'Пропустить',
+  'reminder.weeklyStats': 'На этой неделе: {taken}/{total}',
 
   'settings.profileSection': 'Профиль',
   'settings.profileSummary': '{gender}, {age} лет',

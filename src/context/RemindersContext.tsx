@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Reminder, ReminderCategory } from '../data/reminders';
 import {
   configureNotificationHandler,
+  configureAdherenceCategory,
   scheduleReminderNotification,
   cancelReminderNotification,
 } from '../notifications/reminderNotifications';
@@ -35,6 +36,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     configureNotificationHandler();
+    configureAdherenceCategory(t('reminder.taken'), t('reminder.skip'));
     AsyncStorage.getItem(STORAGE_KEY)
       .then((raw) => {
         if (raw) setReminders(JSON.parse(raw));
@@ -55,10 +57,11 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function addReminder(input: NewReminder) {
-    const notificationId = await scheduleReminderNotification(input, notificationLabels(input.category));
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const notificationId = await scheduleReminderNotification({ ...input, id }, notificationLabels(input.category));
     const reminder: Reminder = {
       ...input,
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      id,
       enabled: true,
       createdAt: Date.now(),
       notificationId,

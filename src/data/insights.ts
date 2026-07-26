@@ -35,7 +35,7 @@ function classifySpo2(percent: number): InsightStatus {
   return 'good';
 }
 
-function classify(measurement: Measurement): InsightStatus {
+export function classify(measurement: Measurement): InsightStatus {
   if (measurement.type === 'bloodPressure') return classifyBloodPressure(measurement.systolic, measurement.diastolic);
   if (measurement.type === 'pulse') return classifyPulse(measurement.bpm);
   return classifySpo2(measurement.percent);

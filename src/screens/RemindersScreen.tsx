@@ -5,6 +5,8 @@ import { useTheme } from '../theme';
 import ReminderIcon from '../components/ReminderIcon';
 import ReminderListItem from '../components/ReminderListItem';
 import { useReminders } from '../context/RemindersContext';
+import { useReminderLog } from '../context/ReminderLogContext';
+import { weeklyStats } from '../data/reminderLog';
 import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
 import { getReminderPermissionStatus, requestReminderPermissions } from '../notifications/reminderNotifications';
@@ -17,6 +19,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Reminders'>;
 export default function RemindersScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
   const { reminders, toggleReminder, deleteReminder } = useReminders();
+  const { log, logEntry } = useReminderLog();
   const { t } = useLocale();
   const [permissionStatus, setPermissionStatus] = useState<ReminderPermissionStatus | null>(null);
 
@@ -119,6 +122,9 @@ export default function RemindersScreen({ navigation }: Props) {
               onToggle={(value) => toggleReminder(reminder.id, value)}
               onDelete={() => deleteReminder(reminder.id)}
               showDivider={index < sorted.length - 1}
+              weeklyStats={weeklyStats(log, reminder.id)}
+              onLogTaken={() => logEntry(reminder.id, 'taken')}
+              onLogSkipped={() => logEntry(reminder.id, 'skipped')}
             />
           ))}
         </View>
