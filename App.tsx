@@ -7,6 +7,7 @@ import { ProfileProvider } from './src/context/ProfileContext';
 import { MeasurementsProvider } from './src/context/MeasurementsContext';
 import { RemindersProvider } from './src/context/RemindersContext';
 import { EmergencyContactsProvider } from './src/context/EmergencyContactsContext';
+import { BleProvider } from './src/context/BleContext';
 import RootNavigator from './src/navigation/RootNavigator';
 
 export default function App() {
@@ -19,8 +20,10 @@ export default function App() {
               <MeasurementsProvider>
                 <RemindersProvider>
                   <EmergencyContactsProvider>
-                    <RootNavigator />
-                    <StatusBar style="auto" />
+                    <BleProvider>
+                      <RootNavigator />
+                      <StatusBar style="auto" />
+                    </BleProvider>
                   </EmergencyContactsProvider>
                 </RemindersProvider>
               </MeasurementsProvider>

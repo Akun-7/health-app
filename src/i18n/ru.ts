@@ -83,6 +83,16 @@ export const ru: Record<TranslationKey, string> = {
   'doctorInbox.title': 'Пациенты',
   'doctorInbox.empty': 'Пока никто не написал.',
 
+  'bluetooth.title': 'Bluetooth',
+  'bluetooth.subtitle': 'Найдите тонометр или пульсоксиметр для подключения',
+  'bluetooth.unsupported': 'Bluetooth не поддерживается в веб-версии и Expo Go — нужна отдельная сборка dev client.',
+  'bluetooth.startScan': 'Поиск',
+  'bluetooth.stopScan': 'Остановить',
+  'bluetooth.noDevices': 'Устройства не найдены',
+  'bluetooth.waitingReading': 'Ожидание показателя...',
+  'bluetooth.disconnect': 'Отключить',
+  'bluetooth.saved': 'Сохранено',
+
   'insights.empty': 'Недостаточно данных для анализа. Добавьте несколько измерений.',
   'insights.status.good': 'В норме',
   'insights.status.watch': 'Стоит понаблюдать',

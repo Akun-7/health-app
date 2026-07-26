@@ -82,6 +82,16 @@ export const ky = {
   'doctorInbox.title': 'Пациенттер',
   'doctorInbox.empty': 'Азырынча эч ким билдирүү жазган эмес.',
 
+  'bluetooth.title': 'Bluetooth',
+  'bluetooth.subtitle': 'Тонометр же пульсоксиметр менен туташуу үчүн аны издеп табыңыз',
+  'bluetooth.unsupported': "Bluetooth веб-версияда жана Expo Go'до колдоого алынбайт — атайын dev client build керек.",
+  'bluetooth.startScan': 'Издөө',
+  'bluetooth.stopScan': 'Токтотуу',
+  'bluetooth.noDevices': 'Түзмөктөр табылган жок',
+  'bluetooth.waitingReading': 'Көрсөткүч күтүлүүдө...',
+  'bluetooth.disconnect': 'Ажыратуу',
+  'bluetooth.saved': 'Сакталды',
+
   'insights.empty': 'Талдоо жасоо үчүн жетиштүү маалымат жок. Бир нече өлчөө кошуңуз.',
   'insights.status.good': 'Калыпта',
   'insights.status.watch': 'Байкоо керек',

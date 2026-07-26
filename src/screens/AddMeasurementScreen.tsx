@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
-import { IconArrowLeft } from '@tabler/icons-react-native';
+import { IconArrowLeft, IconBluetooth } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
@@ -80,7 +80,15 @@ export default function AddMeasurementScreen({ navigation }: Props) {
           >
             <IconArrowLeft size={sizes.iconDecorative} color={colors.textPrimary} />
           </Pressable>
-          <Text style={{ ...typography.h1, color: colors.textPrimary }}>{t('measurement.add')}</Text>
+          <Text style={{ ...typography.h1, color: colors.textPrimary, flex: 1 }}>{t('measurement.add')}</Text>
+          <Pressable
+            onPress={() => navigation.navigate('Bluetooth')}
+            hitSlop={8}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}
+          >
+            <IconBluetooth size={sizes.iconInline} color={colors.primary} />
+            <Text style={{ ...typography.caption, color: colors.primary }}>{t('bluetooth.title')}</Text>
+          </Pressable>
         </View>
 
         <View style={{ gap: spacing.xl }}>

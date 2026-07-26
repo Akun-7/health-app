@@ -19,6 +19,7 @@ import EmergencyContactsScreen from '../screens/EmergencyContactsScreen';
 import AddEmergencyContactScreen from '../screens/AddEmergencyContactScreen';
 import ChatScreen from '../screens/ChatScreen';
 import DoctorInboxScreen from '../screens/DoctorInboxScreen';
+import BluetoothScreen from '../screens/BluetoothScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -36,6 +37,7 @@ export type RootStackParamList = {
   AddEmergencyContact: undefined;
   Chat: { patientId?: string; patientEmail?: string } | undefined;
   DoctorInbox: undefined;
+  Bluetooth: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -92,6 +94,7 @@ export default function RootNavigator() {
         <Stack.Screen name="AddEmergencyContact" component={AddEmergencyContactScreen} />
         <Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="DoctorInbox" component={DoctorInboxScreen} />
+        <Stack.Screen name="Bluetooth" component={BluetoothScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -83,6 +83,16 @@ export const en: Record<TranslationKey, string> = {
   'doctorInbox.title': 'Patients',
   'doctorInbox.empty': "No one has written yet.",
 
+  'bluetooth.title': 'Bluetooth',
+  'bluetooth.subtitle': 'Scan to find your blood pressure monitor or pulse oximeter',
+  'bluetooth.unsupported': "Bluetooth isn't supported on web or in Expo Go — it needs a custom dev client build.",
+  'bluetooth.startScan': 'Scan',
+  'bluetooth.stopScan': 'Stop',
+  'bluetooth.noDevices': 'No devices found',
+  'bluetooth.waitingReading': 'Waiting for a reading...',
+  'bluetooth.disconnect': 'Disconnect',
+  'bluetooth.saved': 'Saved',
+
   'insights.empty': 'Not enough data for analysis yet. Add a few measurements.',
   'insights.status.good': 'Normal',
   'insights.status.watch': 'Worth watching',

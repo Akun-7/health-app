@@ -16,7 +16,7 @@
 ## Тех стек (иш жүзүндө колдонулуп жаткан)
 
 - **Mobile:** Expo SDK ~54 (2026-07-25'тен баштап; мурун 57 эле, физикалык түзмөктөгү Expo Go'нун SDK 54'кө чейин гана колдогонуна байланыштуу түшүрүлдү), React Native 0.81, React 19.1, TypeScript
-- **Навигация:** `@react-navigation/native` + `native-stack` (v7) — бир гана `RootNavigator` (`src/navigation/RootNavigator.tsx`), stack ичинде экрандар: Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox. Баштапкы route `AuthContext`/`ProfileContext`нин `loading` бүткөндөн кийин эсептелет: `!user` → Login, `user.role === 'doctor'` → DoctorInbox (ProfileSetup/Dashboard такыр четтелет), `!profile` → ProfileSetup, экинчиси → Dashboard.
+- **Навигация:** `@react-navigation/native` + `native-stack` (v7) — бир гана `RootNavigator` (`src/navigation/RootNavigator.tsx`), stack ичинде экрандар: Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth. Баштапкы route `AuthContext`/`ProfileContext`нин `loading` бүткөндөн кийин эсептелет: `!user` → Login, `user.role === 'doctor'` → DoctorInbox (ProfileSetup/Dashboard такыр четтелет), `!profile` → ProfileSetup, экинчиси → Dashboard.
 - **State/сактоо:** React Context (`createContext`/`useContext`) ар бир домен үчүн өзүнчө provider, дайыма `@react-native-async-storage/async-storage` менен персистенттелет:
   - `MeasurementsContext` → `health-app/measurements`
   - `ProfileContext` → `health-app/profile`
@@ -32,6 +32,7 @@
 - **Билдирмелер (reminders):** `expo-notifications`, логика `src/notifications/reminderNotifications.ts` ичинде
 - **Дизайн токендер:** `src/theme/` — `colors.ts` (light/dark), `typography.ts`, `spacing.ts`, `radii.ts`, баары `ThemeProvider.tsx` аркылуу `useTheme()` менен колдонулат
 - **SOS:** `expo-sms` (native SMS composer) + `Linking`деги `tel:` fallback. Cloud/backend аркылуу эмес — толугу менен түзмөктүн өзүндө иштейт.
+- **Bluetooth (BLE):** `react-native-ble-plx` — native модуль, **Expo Go'до иштебейт**, custom dev client build талап кылат (`eas build --profile development`). `src/ble/gatt.ts` — Bluetooth SIG стандарттуу Blood Pressure Service (0x1810) жана Pulse Oximeter Service (0x1822) UUID'лары + IEEE-11073 SFLOAT парсинг. `BleContext` сканерлөө/туташуу абалын башкарат, `web` платформасында `supported=false` менен graceful түрдө өчүрүлөт.
 
 ⚠️ **Маанилуу:** `AGENTS.md`де айтылгандай, долбоор SDK 54'кө түшүрүлгөн (Expo Go'нун телефондогу колдоо чегине жараша). Код жазаардын алдында так версияланган документти текшер: https://docs.expo.dev/versions/v54.0.0/
 
@@ -40,6 +41,8 @@
 Эки процесс өзүнчө иштетилиши керек:
 1. **Auth сервер:** `server/` папкасынын ичинде `npm install` (биринчи жолу), андан кийин `npm run dev` — `http://0.0.0.0:4000`де угат.
 2. **Mobile app:** `health-app/` тамырында `npx expo start` (же `--web`) — Metro'нун LAN IP'син `src/api/client.ts` автоматтык алат (`expo-constants`теги `hostUri` аркылуу), сервердин портун (4000) гана өзгөрүшсүз колдонот. Телефон/эмулятор компьютер менен бир Wi-Fi'де болушу керек, антпесе `auth.networkError` көрүнөт.
+
+⚠️ **Bluetooth'ту текшерүү үчүн Expo Go жетишсиз** — `react-native-ble-plx` native код талап кылат. Керек болот: `eas login` (колдонуучунун өз Expo аккаунту менен), `eas build:configure`, `eas build --platform android --profile development` (профиль `eas.json`де даяр). Курулган APK'ды телефонго орнотуп, андан кийин `npx expo start --dev-client` менен туташуу. Бул компьютерде Android SDK/gradle/Java жок (текшерилди, 2026-07-26) — локалдуу build мүмкүн эмес, EAS Build (cloud) гана жол. Expo access token'дерди Claude'го эч качан түз бербеңиз (чат билдирүүсү катары да, `!` командасынын ичинде да) — эки жолу ушундай окуя болгон, экөө тең revoke кылынышы керек болчу.
 
 ## Папка структурасы (иш жүзүндөгү)
 
@@ -50,13 +53,14 @@ health-app/
   app.json
   src/
     api/             — client.ts (fetch wrapper + LAN base URL), errors.ts (ApiErrorCode → TranslationKey)
+    ble/             — gatt.ts (стандарттуу BLE UUID'лар + IEEE-11073 SFLOAT парсинг, native модулго көз каранды эмес)
     components/     — Button, TextField, VitalCard, MeasurementIcon, ReminderIcon, ReminderListItem, ThemeModeSelector, LanguageSelector, MedicalDisclaimer, SettingsLinkRow
-    context/         — MeasurementsContext, ProfileContext, RemindersContext, SettingsContext, LocaleContext, AuthContext, EmergencyContactsContext
+    context/         — MeasurementsContext, ProfileContext, RemindersContext, SettingsContext, LocaleContext, AuthContext, EmergencyContactsContext, BleContext
     data/            — measurements.ts, profile.ts, reminders.ts, insights.ts, emergencyContacts.ts, sos.ts (типтер + форматтоо/эсептөө функциялары; көрсөтүлүүчү тексттер эмес — алар i18n'де)
     i18n/            — ky.ts (канондук), ru.ts, en.ts
     navigation/       — RootNavigator.tsx
     notifications/    — reminderNotifications.ts
-    screens/          — Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox
+    screens/          — Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth
     theme/            — colors, typography, spacing, radii, ThemeProvider
   server/            — локалдуу Express auth+chat сервери (өз package.json'у, health-app'тин ичине кирбейт)
     src/
@@ -90,7 +94,7 @@ health-app/
 
 ## MVP чөйрөсүнөн чыкпоо
 
-Азырынча кошулбайт: Bluetooth интеграция. Ал — кийинки фаза. (i18n (ru/en), backend/auth сервер, SOS жана телемедицина (чат) ишке ашырылды — жогорудагы тиешелүү бөлүмдөрдү кара. Backend азырынча **тек локалдуу** — cloud'го deploy кылынган эмес, production'го чыгаруу өзүнчө чоң чечим.)
+CLAUDE.mdде баштапкы белгиленген бардык "кийинки фазалар" (i18n, backend/auth, SOS, телемедицина, Bluetooth) ишке ашырылды — жогорудагы тиешелүү бөлүмдөрдү кара. Backend азырынча **тек локалдуу** — cloud'го deploy кылынган эмес, production'го чыгаруу өзүнчө чоң чечим.
 
 **"AI-анализ" жөнүндө эскертүү:** `InsightsScreen` (`quickLink.insights` → "Талдоо") жана `src/data/insights.ts` чыныгы AI/ML эмес — сакталган өлчөөлөрдү стандарттык медициналык диапазондорго салыштырган локалдуу эвристика (`computeInsights`: `good`/`watch`/`concern` статусу + мурунку жазуу менен салыштырылган тренд). Тармакка чыгуу, LLM чакыруу жок. UI тексттеринде "AI" деп аталбайт — колдонуучуну алдабоо үчүн.
 
@@ -99,6 +103,8 @@ health-app/
 ⚠️ `SOSScreen.tsx`деги `tel:` fallback `Platform.OS !== 'web'` менен корголгон — веб браузерде (десктоп Chrome/Windows) `tel:` ачууга аракет "Open Phone Link?" сыяктуу native OS диалогун чакырат, ал бүтүндөй браузер терезесинин focus'ун талап кылат (`document.visibilityState` `hidden` болуп калат, андан аркы CDP/screenshot аркылуу текшерүү мүмкүн болбой калат). Мобилдик түзмөктө мындай көйгөй жок — `tel:` түз Телефон колдонмосун ачат.
 
 **"Телемедицина" жөнүндө эскертүү:** Video/аудио чалуу жок — **тек текст чат**, `ChatScreen`/`DoctorInboxScreen`/`server/src/chatStore.ts` аркылуу. Poll'доо менен (3 сек интервал) "реалдуу убакытка жакын" эффект түзүлөт, WebSocket жок. **Дарыгер каттоосу эч кандай жол менен текшерилбейт** — SignUp'та "Мен дарыгермин" деген checkbox'ту каалаган адам басып, өзүн дарыгер катары каттай алат (медициналык лицензия/диплом сурала турган логика жок). Бул MVP/dev-only контекстте гана колдонулушу керек — чыныгы колдонуучулар менен эч качан. Бир дарыгер каттоо болсо, ал БАРДЫК пациенттердин билдирүүлөрүн көрөт жана жооп бере алат (пациент конкреттүү дарыгер тандабайт, дарыгер-пациент тиешелүү бөлүштүрүү жок — бирдиктүү inbox модели).
+
+**Bluetooth жөнүндө эскертүү:** `src/ble/gatt.ts`деги парсинг Bluetooth SIG'дин расмий Blood Pressure Service (0x1810) жана Pulse Oximeter Service (0x1822) спецификацияларына негизделген (стандарттуу IEEE-11073 SFLOAT форматы), бирок **чыныгы медициналык түзмөк менен эч качан текшерилген эмес** — бул компьютерде Bluetooth аппараттык колдоо/физикалык тонометр жок болгондуктан, код эмуляциясыз/hardware'сиз гана typecheck деңгээлинде текшерилди. Дагы бир чектөө: build процесси EAS Build (cloud) аркылуу гана мүмкүн болду (локалдуу Android SDK жок), демек `eas login`/`eas build` командаларын **колдонуучунун өзү** өз терминалында иштеткен — Expo access token эч качан Claude'дун Bash куралы аркылуу өтпөгөн (эки жолу ката коркунуч болгон, б.а. token чат билдирүүсү катары кокустан жиберилген, экөө тең revoke кылынган).
 
 ## Эскертүү
 

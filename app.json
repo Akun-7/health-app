@@ -21,6 +21,16 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-notifications"]
+    "plugins": [
+      "expo-notifications",
+      [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": false,
+          "modes": ["central"],
+          "bluetoothAlwaysPermission": "Тонометр же пульсоксиметр сыяктуу Bluetooth түзмөктөрдү табуу жана туташуу үчүн"
+        }
+      ]
+    ]
   }
 }
