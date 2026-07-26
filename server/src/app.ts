@@ -2,25 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import { createUser, findByEmail, findById } from './userStore';
-import { signToken, verifyToken } from './auth';
+import type { UserRole } from './userStore';
+import { signToken } from './auth';
+import { requireAuth } from './authMiddleware';
+import type { AuthedRequest } from './authMiddleware';
+import { createChatRouter } from './chatRoutes';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 6;
 
-function toPublicUser(user: { id: string; email: string }) {
-  return { id: user.id, email: user.email };
-}
-
-function requireAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
-  const header = req.header('authorization') || '';
-  const token = header.startsWith('Bearer ') ? header.slice('Bearer '.length) : null;
-  const userId = token ? verifyToken(token) : null;
-  if (!userId) {
-    res.status(401).json({ error: 'unauthorized' });
-    return;
-  }
-  (req as express.Request & { userId: string }).userId = userId;
-  next();
+export function toPublicUser(user: { id: string; email: string; role: UserRole }) {
+  return { id: user.id, email: user.email, role: user.role };
 }
 
 export function createApp() {
@@ -29,7 +21,7 @@ export function createApp() {
   app.use(express.json());
 
   app.post('/api/auth/signup', async (req, res) => {
-    const { email, password } = req.body ?? {};
+    const { email, password, role } = req.body ?? {};
     if (typeof email !== 'string' || !EMAIL_PATTERN.test(email)) {
       res.status(400).json({ error: 'invalid_email' });
       return;
@@ -42,8 +34,9 @@ export function createApp() {
       res.status(409).json({ error: 'email_taken' });
       return;
     }
+    const resolvedRole: UserRole = role === 'doctor' ? 'doctor' : 'patient';
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = createUser(email, passwordHash);
+    const user = createUser(email, passwordHash, resolvedRole);
     res.status(201).json({ token: signToken(user.id), user: toPublicUser(user) });
   });
 
@@ -59,7 +52,7 @@ export function createApp() {
   });
 
   app.get('/api/auth/me', requireAuth, (req, res) => {
-    const userId = (req as express.Request & { userId: string }).userId;
+    const userId = (req as AuthedRequest).userId;
     const user = findById(userId);
     if (!user) {
       res.status(401).json({ error: 'unauthorized' });
@@ -67,6 +60,8 @@ export function createApp() {
     }
     res.json({ user: toPublicUser(user) });
   });
+
+  app.use('/api/chat', createChatRouter());
 
   return app;
 }

@@ -16,7 +16,7 @@
 ## Тех стек (иш жүзүндө колдонулуп жаткан)
 
 - **Mobile:** Expo SDK ~54 (2026-07-25'тен баштап; мурун 57 эле, физикалык түзмөктөгү Expo Go'нун SDK 54'кө чейин гана колдогонуна байланыштуу түшүрүлдү), React Native 0.81, React 19.1, TypeScript
-- **Навигация:** `@react-navigation/native` + `native-stack` (v7) — бир гана `RootNavigator` (`src/navigation/RootNavigator.tsx`), stack ичинде экрандар: Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact. Баштапкы route `AuthContext`/`ProfileContext`нин `loading` бүткөндөн кийин эсептелет: `!user` → Login, `!profile` → ProfileSetup, экинчиси → Dashboard.
+- **Навигация:** `@react-navigation/native` + `native-stack` (v7) — бир гана `RootNavigator` (`src/navigation/RootNavigator.tsx`), stack ичинде экрандар: Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox. Баштапкы route `AuthContext`/`ProfileContext`нин `loading` бүткөндөн кийин эсептелет: `!user` → Login, `user.role === 'doctor'` → DoctorInbox (ProfileSetup/Dashboard такыр четтелет), `!profile` → ProfileSetup, экинчиси → Dashboard.
 - **State/сактоо:** React Context (`createContext`/`useContext`) ар бир домен үчүн өзүнчө provider, дайыма `@react-native-async-storage/async-storage` менен персистенттелет:
   - `MeasurementsContext` → `health-app/measurements`
   - `ProfileContext` → `health-app/profile`
@@ -26,7 +26,7 @@
   - `AuthContext` → `health-app/authToken` (JWT гана сакталат; `user` объектиси серверден `/api/auth/me` менен алынат)
   - `EmergencyContactsContext` → `health-app/emergencyContacts`
   - **Zustand, Redux, Prisma, PostgreSQL — колдонулбайт.** (Мурунку талкууда сунушталган, бирок иш жүзүндө башка жол тандалган.)
-- **Backend/auth:** `server/` — Express + TypeScript, `tsx` менен иштейт (`npm run dev` — `server/`дин ичинде). Колдонуучулар `server/data/users.json` файлында сакталат (JSON, native DB эмес — `better-sqlite3` бул машинада Visual Studio Build Tools жоктугунан compile болбойт, ошондуктан колдонулбайт). Пароль `bcryptjs` менен hash'делет, сессия `jsonwebtoken` (`JWT_SECRET` env, дефолт — dev-only туруктуу сыр сөз). Эндпоинттер: `POST /api/auth/signup`, `POST /api/auth/login`, `GET /api/auth/me` (`Authorization: Bearer <token>`). `src/api/client.ts` серверди `expo-constants`теги `hostUri`ден LAN IP'ди алып табат (телефон/веб экөө тең иштеши үчүн), порт 4000ге катуу коюлган.
+- **Backend/auth:** `server/` — Express + TypeScript, `tsx` менен иштейт (`npm run dev` — `server/`дин ичинде). Колдонуучулар `server/data/users.json` файлында сакталат (JSON, native DB эмес — `better-sqlite3` бул машинада Visual Studio Build Tools жоктугунан compile болбойт, ошондуктан колдонулбайт). Пароль `bcryptjs` менен hash'делет, сессия `jsonwebtoken` (`JWT_SECRET` env, дефолт — dev-only туруктуу сыр сөз). Ар бир колдонуучунун `role: 'patient' | 'doctor'` талаасы бар (signup'та тандалат, эч кандай текшерүү жок). Эндпоинттер: `POST /api/auth/signup` (`{email,password,role?}`), `POST /api/auth/login`, `GET /api/auth/me` (`Authorization: Bearer <token>`); чат — `GET/POST /api/chat/messages` (пациенттин өз thread'и), `GET /api/chat/threads` (дарыгер-гана, бардык пациенттердин тизмеси), `GET/POST /api/chat/messages/:patientId` (дарыгер-гана, белгилүү пациенттин thread'и). `requireAuth`/`AuthedRequest` `server/src/authMiddleware.ts`де — `app.ts` менен `chatRoutes.ts`нин ортосундагы circular import'ту болтурбоо үчүн өзүнчө файлга бөлүнгөн. `src/api/client.ts` серверди `expo-constants`теги `hostUri`ден LAN IP'ди алып табат (телефон/веб экөө тең иштеши үчүн), порт 4000ге катуу коюлган.
 - **i18n:** `src/i18n/{ky,ru,en}.ts` — тегиз (dot-namespaced) ачкычтуу сөздүктөр, `ky.ts` канондук (`TranslationKey` ушундан чыгарылат, `ru`/`en` `Record<TranslationKey, string>` менен толуктугу текшерилет). `LocaleContext`деги `t(key, params?)` `{param}` интерполяциясын колдойт. Тил тандагычта ар бир тил өз энчилүү атында көрсөтүлөт (`localeNativeName`), учурдагы тилге которулбайт.
 - **Иконкалар:** `@tabler/icons-react-native`
 - **Билдирмелер (reminders):** `expo-notifications`, логика `src/notifications/reminderNotifications.ts` ичинде
@@ -56,14 +56,17 @@ health-app/
     i18n/            — ky.ts (канондук), ru.ts, en.ts
     navigation/       — RootNavigator.tsx
     notifications/    — reminderNotifications.ts
-    screens/          — Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact
+    screens/          — Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox
     theme/            — colors, typography, spacing, radii, ThemeProvider
-  server/            — локалдуу Express auth сервери (өз package.json'у, health-app'тин ичине кирбейт)
+  server/            — локалдуу Express auth+chat сервери (өз package.json'у, health-app'тин ичине кирбейт)
     src/
       index.ts        — listen(0.0.0.0:4000)
-      app.ts           — Express routes (signup/login/me)
+      app.ts           — Express app + auth routes (signup/login/me)
+      authMiddleware.ts — requireAuth (app.ts менен chatRoutes.ts экөө тең колдонот)
+      chatRoutes.ts     — /api/chat/* (requireDoctor гейт менен)
       auth.ts          — JWT sign/verify
-      userStore.ts      — data/users.json'го окуу/жазуу
+      userStore.ts      — data/users.json'го окуу/жазуу (role талаасы менен)
+      chatStore.ts      — data/messages.json'го окуу/жазуу
 ```
 
 ## Дайын модели (учурда)
@@ -87,13 +90,15 @@ health-app/
 
 ## MVP чөйрөсүнөн чыкпоо
 
-Азырынча кошулбайт: Bluetooth интеграция, телемедицина. Булар — кийинки фазалар. (i18n (ru/en), backend/auth сервер жана SOS ишке ашырылды — жогорудагы тиешелүү бөлүмдөрдү кара. Backend азырынча **тек локалдуу** — cloud'го deploy кылынган эмес, production'го чыгаруу өзүнчө чоң чечим.)
+Азырынча кошулбайт: Bluetooth интеграция. Ал — кийинки фаза. (i18n (ru/en), backend/auth сервер, SOS жана телемедицина (чат) ишке ашырылды — жогорудагы тиешелүү бөлүмдөрдү кара. Backend азырынча **тек локалдуу** — cloud'го deploy кылынган эмес, production'го чыгаруу өзүнчө чоң чечим.)
 
 **"AI-анализ" жөнүндө эскертүү:** `InsightsScreen` (`quickLink.insights` → "Талдоо") жана `src/data/insights.ts` чыныгы AI/ML эмес — сакталган өлчөөлөрдү стандарттык медициналык диапазондорго салыштырган локалдуу эвристика (`computeInsights`: `good`/`watch`/`concern` статусу + мурунку жазуу менен салыштырылган тренд). Тармакка чыгуу, LLM чакыруу жок. UI тексттеринде "AI" деп аталбайт — колдонуучуну алдабоо үчүн.
 
 **"SOS/үй-бүлөлүк көзөмөл" жөнүндө эскертүү:** Ишке ашкан бөлүгү — SOS (`SOSScreen`, `EmergencyContactsContext`, `src/data/sos.ts`): колдонуучу шашылыш байланыштарын локалдуу сактайт, "SOS жиберүү" баскычы `expo-sms` менен native SMS composer'ду (же SMS жеткиликсиз болсо `tel:` аркылуу чалуу) акыркы көрсөткүчтөр менен ачат. **Чыныгы "үй-бүлөлүк көзөмөл" (family member башка түзмөктөн/аккаунттан бул колдонуучунун дайын-дарегин алыстан көрүшү) ишке ашкан эмес** — ал үчүн backend'ди measurements/profile'ды колдонуучу боюнча сактап, бөлүшүү/уруксат механизмин кошуу керек болот (өзүнчө чоң чечим, учурдагы `server/`нин auth-гана масштабынан чыгат).
 
 ⚠️ `SOSScreen.tsx`деги `tel:` fallback `Platform.OS !== 'web'` менен корголгон — веб браузерде (десктоп Chrome/Windows) `tel:` ачууга аракет "Open Phone Link?" сыяктуу native OS диалогун чакырат, ал бүтүндөй браузер терезесинин focus'ун талап кылат (`document.visibilityState` `hidden` болуп калат, андан аркы CDP/screenshot аркылуу текшерүү мүмкүн болбой калат). Мобилдик түзмөктө мындай көйгөй жок — `tel:` түз Телефон колдонмосун ачат.
+
+**"Телемедицина" жөнүндө эскертүү:** Video/аудио чалуу жок — **тек текст чат**, `ChatScreen`/`DoctorInboxScreen`/`server/src/chatStore.ts` аркылуу. Poll'доо менен (3 сек интервал) "реалдуу убакытка жакын" эффект түзүлөт, WebSocket жок. **Дарыгер каттоосу эч кандай жол менен текшерилбейт** — SignUp'та "Мен дарыгермин" деген checkbox'ту каалаган адам басып, өзүн дарыгер катары каттай алат (медициналык лицензия/диплом сурала турган логика жок). Бул MVP/dev-only контекстте гана колдонулушу керек — чыныгы колдонуучулар менен эч качан. Бир дарыгер каттоо болсо, ал БАРДЫК пациенттердин билдирүүлөрүн көрөт жана жооп бере алат (пациент конкреттүү дарыгер тандабайт, дарыгер-пациент тиешелүү бөлүштүрүү жок — бирдиктүү inbox модели).
 
 ## Эскертүү
 

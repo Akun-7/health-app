@@ -17,6 +17,8 @@ import SettingsScreen from '../screens/SettingsScreen';
 import SOSScreen from '../screens/SOSScreen';
 import EmergencyContactsScreen from '../screens/EmergencyContactsScreen';
 import AddEmergencyContactScreen from '../screens/AddEmergencyContactScreen';
+import ChatScreen from '../screens/ChatScreen';
+import DoctorInboxScreen from '../screens/DoctorInboxScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -32,6 +34,8 @@ export type RootStackParamList = {
   SOS: undefined;
   EmergencyContacts: undefined;
   AddEmergencyContact: undefined;
+  Chat: { patientId?: string; patientEmail?: string } | undefined;
+  DoctorInbox: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -50,7 +54,13 @@ export default function RootNavigator() {
     );
   }
 
-  const initialRouteName = !user ? 'Login' : !profile ? 'ProfileSetup' : 'Dashboard';
+  const initialRouteName = !user
+    ? 'Login'
+    : user.role === 'doctor'
+      ? 'DoctorInbox'
+      : !profile
+        ? 'ProfileSetup'
+        : 'Dashboard';
 
   return (
     <NavigationContainer
@@ -80,6 +90,8 @@ export default function RootNavigator() {
         <Stack.Screen name="SOS" component={SOSScreen} />
         <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
         <Stack.Screen name="AddEmergencyContact" component={AddEmergencyContactScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="DoctorInbox" component={DoctorInboxScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

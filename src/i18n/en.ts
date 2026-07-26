@@ -19,6 +19,8 @@ export const en: Record<TranslationKey, string> = {
   'signup.subtitle': 'Sign up to track your health',
   'signup.submit': 'Sign up',
   'signup.haveAccount': 'I already have an account',
+  'signup.doctorToggle': "I'm a doctor (unverified, MVP only)",
+  'signup.doctorDisclaimer': "In this MVP, doctor registration isn't verified against any license or diploma. This option exists only for locally testing both sides of the chat.",
 
   'auth.invalidEmail': 'Invalid email address',
   'auth.invalidPassword': 'Password must be at least 6 characters',
@@ -49,6 +51,7 @@ export const en: Record<TranslationKey, string> = {
   'quickLink.settings': 'Settings',
   'quickLink.insights': 'Insights',
   'quickLink.sos': 'SOS',
+  'quickLink.telemedicine': 'Doctor',
 
   'emergencyContacts.title': 'Emergency contacts',
   'emergencyContacts.empty': 'No contacts yet. Add your first one via the "+" above.',
@@ -69,6 +72,16 @@ export const en: Record<TranslationKey, string> = {
   'sos.message': 'SOS! I need help. My latest readings: {details}',
   'sos.noMeasurements': 'no measurements',
   'sos.smsUnavailable': "SMS isn't available on this device. A call to your first contact will open instead.",
+
+  'chat.title': 'Chat with doctor',
+  'chat.disclaimer': "Doctor registration in this app isn't verified (MVP). In a real emergency, call your local emergency number.",
+  'chat.placeholder': 'Type a message...',
+  'chat.send': 'Send',
+  'chat.empty': 'No messages yet. Write your question to the doctor.',
+  'chat.errorEmpty': 'Message cannot be empty',
+
+  'doctorInbox.title': 'Patients',
+  'doctorInbox.empty': "No one has written yet.",
 
   'insights.empty': 'Not enough data for analysis yet. Add a few measurements.',
   'insights.status.good': 'Normal',

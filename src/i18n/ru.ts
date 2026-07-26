@@ -19,6 +19,8 @@ export const ru: Record<TranslationKey, string> = {
   'signup.subtitle': 'Зарегистрируйтесь, чтобы следить за здоровьем',
   'signup.submit': 'Зарегистрироваться',
   'signup.haveAccount': 'У меня есть аккаунт',
+  'signup.doctorToggle': 'Я врач (не проверено, только MVP)',
+  'signup.doctorDisclaimer': 'В этом MVP регистрация врача никак не проверяется (нет диплома/лицензии). Эта опция только для локального тестирования обеих сторон чата.',
 
   'auth.invalidEmail': 'Некорректный email',
   'auth.invalidPassword': 'Пароль должен быть не короче 6 символов',
@@ -49,6 +51,7 @@ export const ru: Record<TranslationKey, string> = {
   'quickLink.settings': 'Настройки',
   'quickLink.insights': 'Анализ',
   'quickLink.sos': 'SOS',
+  'quickLink.telemedicine': 'Врач',
 
   'emergencyContacts.title': 'Экстренные контакты',
   'emergencyContacts.empty': 'Пока нет контактов. Добавьте первый через «+» выше.',
@@ -69,6 +72,16 @@ export const ru: Record<TranslationKey, string> = {
   'sos.message': 'SOS! Мне нужна помощь. Мои последние показатели: {details}',
   'sos.noMeasurements': 'нет измерений',
   'sos.smsUnavailable': 'На этом устройстве отправка SMS недоступна. Откроется звонок первому контакту.',
+
+  'chat.title': 'Чат с врачом',
+  'chat.disclaimer': 'Регистрация врача в этом приложении не проверяется (MVP). В реальной экстренной ситуации звоните 103.',
+  'chat.placeholder': 'Введите сообщение...',
+  'chat.send': 'Отправить',
+  'chat.empty': 'Пока нет сообщений. Напишите вопрос врачу.',
+  'chat.errorEmpty': 'Сообщение не может быть пустым',
+
+  'doctorInbox.title': 'Пациенты',
+  'doctorInbox.empty': 'Пока никто не написал.',
 
   'insights.empty': 'Недостаточно данных для анализа. Добавьте несколько измерений.',
   'insights.status.good': 'В норме',

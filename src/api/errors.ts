@@ -7,5 +7,7 @@ export const apiErrorKey: Record<ApiErrorCode, TranslationKey> = {
   email_taken: 'auth.emailTaken',
   invalid_credentials: 'auth.invalidCredentials',
   unauthorized: 'auth.invalidCredentials',
+  forbidden: 'auth.invalidCredentials',
+  invalid_input: 'chat.errorEmpty',
   network_error: 'auth.networkError',
 };

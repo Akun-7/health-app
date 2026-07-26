@@ -1,10 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 
+export type UserRole = 'patient' | 'doctor';
+
 export type User = {
   id: string;
   email: string;
   passwordHash: string;
+  role: UserRole;
   createdAt: number;
 };
 
@@ -28,12 +31,13 @@ export function findById(id: string): User | undefined {
   return load().find((u) => u.id === id);
 }
 
-export function createUser(email: string, passwordHash: string): User {
+export function createUser(email: string, passwordHash: string, role: UserRole): User {
   const users = load();
   const user: User = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
     email,
     passwordHash,
+    role,
     createdAt: Date.now(),
   };
   users.push(user);

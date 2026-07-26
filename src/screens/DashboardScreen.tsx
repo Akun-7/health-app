@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Pressable } from 'react-native';
-import { IconHistory, IconChartLine, IconBell, IconSettings, IconAlertTriangle } from '@tabler/icons-react-native';
+import { IconHistory, IconChartLine, IconBell, IconSettings, IconAlertTriangle, IconStethoscope } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import VitalCard from '../components/VitalCard';
 import Button from '../components/Button';
@@ -27,14 +27,14 @@ export default function DashboardScreen({ navigation }: Props) {
   }
 
   const quickLinks: {
-    key: 'History' | 'Insights' | 'Reminders' | 'Settings';
+    key: 'History' | 'Insights' | 'Reminders' | 'Chat';
     label: string;
     icon: React.ReactNode;
   }[] = [
     { key: 'History', label: t('quickLink.history'), icon: <IconHistory size={sizes.iconDecorative} color={colors.textPrimary} /> },
     { key: 'Insights', label: t('quickLink.insights'), icon: <IconChartLine size={sizes.iconDecorative} color={colors.textPrimary} /> },
     { key: 'Reminders', label: t('quickLink.reminders'), icon: <IconBell size={sizes.iconDecorative} color={colors.textPrimary} /> },
-    { key: 'Settings', label: t('quickLink.settings'), icon: <IconSettings size={sizes.iconDecorative} color={colors.textPrimary} /> },
+    { key: 'Chat', label: t('quickLink.telemedicine'), icon: <IconStethoscope size={sizes.iconDecorative} color={colors.textPrimary} /> },
   ];
 
   return (

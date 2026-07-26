@@ -18,6 +18,8 @@ export const ky = {
   'signup.subtitle': 'Ден соолугуңузду көзөмөлдөө үчүн катталыңыз',
   'signup.submit': 'Катталуу',
   'signup.haveAccount': 'Аккаунтум бар',
+  'signup.doctorToggle': 'Мен дарыгермин (текшерилбеген, MVP гана)',
+  'signup.doctorDisclaimer': 'Бул MVP\'де дарыгер каттоосу эч кандай медициналык лицензия/диплом менен текшерилбейт. Бул опция дароо жагы иштерин локалдуу текшерүү үчүн гана.',
 
   'auth.invalidEmail': 'Email туура эмес',
   'auth.invalidPassword': 'Сырсөз кеминде 6 белгиден турушу керек',
@@ -48,6 +50,7 @@ export const ky = {
   'quickLink.settings': 'Жөндөөлөр',
   'quickLink.insights': 'Талдоо',
   'quickLink.sos': 'SOS',
+  'quickLink.telemedicine': 'Дарыгер',
 
   'emergencyContacts.title': 'Шашылыш байланыштар',
   'emergencyContacts.empty': 'Азырынча байланыш кошулган эмес. Жогорудагы "+" аркылуу биринчисин кошуңуз.',
@@ -68,6 +71,16 @@ export const ky = {
   'sos.message': 'SOS! Мага жардам керек. Акыркы көрсөткүчтөрүм: {details}',
   'sos.noMeasurements': 'өлчөө жок',
   'sos.smsUnavailable': 'Бул түзмөктө SMS жөнөтүү мүмкүн эмес. Биринчи байланышка чалуу ачылат.',
+
+  'chat.title': 'Дарыгер менен чат',
+  'chat.disclaimer': 'Бул колдонмодогу дарыгер каттоосу текшерилген эмес (MVP). Чыныгы шашылыш учурда 103ко чалыңыз.',
+  'chat.placeholder': 'Билдирүү жазыңыз...',
+  'chat.send': 'Жиберүү',
+  'chat.empty': 'Азырынча билдирүү жок. Дарыгерге суроо жазыңыз.',
+  'chat.errorEmpty': 'Билдирүү бош болбошу керек',
+
+  'doctorInbox.title': 'Пациенттер',
+  'doctorInbox.empty': 'Азырынча эч ким билдирүү жазган эмес.',
 
   'insights.empty': 'Талдоо жасоо үчүн жетиштүү маалымат жок. Бир нече өлчөө кошуңуз.',
   'insights.status.good': 'Калыпта',

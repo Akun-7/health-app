@@ -18,6 +18,8 @@ export type ApiErrorCode =
   | 'email_taken'
   | 'invalid_credentials'
   | 'unauthorized'
+  | 'forbidden'
+  | 'invalid_input'
   | 'network_error';
 
 export class ApiError extends Error {
@@ -50,11 +52,12 @@ async function request<T>(path: string, options?: { method?: string; body?: unkn
   return data as T;
 }
 
-export type AuthUser = { id: string; email: string };
+export type UserRole = 'patient' | 'doctor';
+export type AuthUser = { id: string; email: string; role: UserRole };
 export type AuthResponse = { token: string; user: AuthUser };
 
-export function signup(email: string, password: string) {
-  return request<AuthResponse>('/api/auth/signup', { method: 'POST', body: { email, password } });
+export function signup(email: string, password: string, role: UserRole) {
+  return request<AuthResponse>('/api/auth/signup', { method: 'POST', body: { email, password, role } });
 }
 
 export function login(email: string, password: string) {
@@ -63,4 +66,44 @@ export function login(email: string, password: string) {
 
 export function fetchMe(token: string) {
   return request<{ user: AuthUser }>('/api/auth/me', { token });
+}
+
+export type ChatMessage = {
+  id: string;
+  patientId: string;
+  senderId: string;
+  senderRole: UserRole;
+  text: string;
+  createdAt: number;
+};
+
+export type ChatThread = {
+  patientId: string;
+  patientEmail: string;
+  lastMessage: string;
+  lastMessageAt: number;
+};
+
+export function fetchMyMessages(token: string) {
+  return request<{ messages: ChatMessage[] }>('/api/chat/messages', { token });
+}
+
+export function sendMyMessage(token: string, text: string) {
+  return request<{ message: ChatMessage }>('/api/chat/messages', { method: 'POST', body: { text }, token });
+}
+
+export function fetchThreads(token: string) {
+  return request<{ threads: ChatThread[] }>('/api/chat/threads', { token });
+}
+
+export function fetchPatientMessages(token: string, patientId: string) {
+  return request<{ messages: ChatMessage[] }>(`/api/chat/messages/${patientId}`, { token });
+}
+
+export function sendPatientMessage(token: string, patientId: string, text: string) {
+  return request<{ message: ChatMessage }>(`/api/chat/messages/${patientId}`, {
+    method: 'POST',
+    body: { text },
+    token,
+  });
 }

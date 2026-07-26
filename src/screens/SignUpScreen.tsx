@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
+import { IconSquare, IconSquareCheck } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
@@ -13,11 +14,12 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 type Props = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
 
 export default function SignUpScreen({ navigation }: Props) {
-  const { colors, typography, spacing } = useTheme();
+  const { colors, typography, spacing, radii } = useTheme();
   const { t } = useLocale();
   const { signup } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isDoctor, setIsDoctor] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,8 +31,8 @@ export default function SignUpScreen({ navigation }: Props) {
     setError('');
     setLoading(true);
     try {
-      await signup(email.trim(), password);
-      navigation.reset({ index: 0, routes: [{ name: 'ProfileSetup' }] });
+      await signup(email.trim(), password, isDoctor ? 'doctor' : 'patient');
+      navigation.reset({ index: 0, routes: [{ name: isDoctor ? 'DoctorInbox' : 'ProfileSetup' }] });
     } catch (err) {
       setError(err instanceof ApiError ? t(apiErrorKey[err.code]) : t('auth.networkError'));
     } finally {
@@ -68,6 +70,31 @@ export default function SignUpScreen({ navigation }: Props) {
             />
             {error ? (
               <Text style={{ ...typography.small, color: colors.danger }}>{error}</Text>
+            ) : null}
+          </View>
+
+          <View style={{ gap: spacing.xs }}>
+            <Pressable
+              onPress={() => setIsDoctor((prev) => !prev)}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}
+            >
+              {isDoctor ? (
+                <IconSquareCheck size={20} color={colors.primary} />
+              ) : (
+                <IconSquare size={20} color={colors.textMuted} />
+              )}
+              <Text style={{ ...typography.caption, color: colors.textPrimary, flex: 1 }}>{t('signup.doctorToggle')}</Text>
+            </Pressable>
+            {isDoctor ? (
+              <View
+                style={{
+                  backgroundColor: colors.warningBg,
+                  borderRadius: radii.card,
+                  padding: spacing.sm,
+                }}
+              >
+                <Text style={{ ...typography.small, color: colors.textSecondary }}>{t('signup.doctorDisclaimer')}</Text>
+              </View>
             ) : null}
           </View>
 
