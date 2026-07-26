@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Reminder, ReminderCategory } from '../data/reminders';
 import {
@@ -8,6 +8,8 @@ import {
   cancelReminderNotification,
 } from '../notifications/reminderNotifications';
 import { useLocale } from './LocaleContext';
+import { useAuth } from './AuthContext';
+import { fetchCloudReminders, syncCloudReminders } from '../api/client';
 import type { TranslationKey } from '../i18n/ky';
 
 const STORAGE_KEY = 'health-app/reminders';
@@ -31,23 +33,12 @@ const RemindersContext = createContext<RemindersContextValue | null>(null);
 
 export function RemindersProvider({ children }: { children: React.ReactNode }) {
   const { t } = useLocale();
+  const { token, loading: authLoading } = useAuth();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    configureNotificationHandler();
-    configureAdherenceCategory(t('reminder.taken'), t('reminder.skip'));
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((raw) => {
-        if (raw) setReminders(JSON.parse(raw));
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  async function persist(next: Reminder[]) {
-    setReminders(next);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  }
+  const [localReady, setLocalReady] = useState(false);
+  const hasLocalRef = useRef(false);
+  const syncedRef = useRef(false);
 
   function notificationLabels(category: ReminderCategory) {
     return {
@@ -55,6 +46,75 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
       channelName: t('reminder.channelName'),
     };
   }
+
+  async function persist(next: Reminder[]) {
+    setReminders(next);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    if (token) syncCloudReminders(token, next).catch(() => {});
+  }
+
+  // Notification IDs are only valid on the device that scheduled them — a
+  // reminder recovered from another phone needs to be rescheduled locally
+  // before it can actually fire.
+  async function rescheduleForThisDevice(remote: Reminder[]): Promise<Reminder[]> {
+    return Promise.all(
+      remote.map(async (reminder) => {
+        if (!reminder.enabled) return { ...reminder, notificationId: null };
+        const notificationId = await scheduleReminderNotification(reminder, notificationLabels(reminder.category));
+        return { ...reminder, notificationId };
+      })
+    );
+  }
+
+  useEffect(() => {
+    configureNotificationHandler();
+    configureAdherenceCategory(t('reminder.taken'), t('reminder.skip'));
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((raw) => {
+        if (raw) {
+          hasLocalRef.current = true;
+          setReminders(JSON.parse(raw));
+        }
+      })
+      .finally(() => setLocalReady(true));
+  }, []);
+
+  // Same reasoning as MeasurementsContext/ProfileContext: don't block the UI
+  // if local data exists, but wait for the server on a fresh device (the
+  // actual "phone lost" recovery case) — and reschedule notifications for
+  // this device once recovered.
+  useEffect(() => {
+    if (!localReady || authLoading || syncedRef.current) return;
+    syncedRef.current = true;
+
+    if (hasLocalRef.current) {
+      // This device already manages its own scheduled notifications —
+      // treat local as authoritative and just push it up, rather than
+      // pulling from remote. Adopting remote data means rescheduling every
+      // notification (see rescheduleForThisDevice), which isn't safe to
+      // repeat on every launch — the old notification would never get
+      // cancelled, silently duplicating alerts over time.
+      setLoading(false);
+      if (!token) return;
+      AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+        if (raw) syncCloudReminders(token, JSON.parse(raw)).catch(() => {});
+      });
+      return;
+    }
+
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    fetchCloudReminders(token)
+      .then(async ({ reminders: remote }) => {
+        if (remote.length > 0) {
+          await persist(await rescheduleForThisDevice(remote));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [localReady, authLoading, token]);
 
   async function addReminder(input: NewReminder) {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;

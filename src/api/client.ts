@@ -1,5 +1,8 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import type { Measurement } from '../data/measurements';
+import type { Profile } from '../data/profile';
+import type { Reminder } from '../data/reminders';
 
 const API_PORT = 4000;
 
@@ -109,6 +112,38 @@ export function sendPatientMessage(token: string, patientId: string, text: strin
   return request<{ message: ChatMessage }>(`/api/chat/messages/${patientId}`, {
     method: 'POST',
     body: { text },
+    token,
+  });
+}
+
+export function fetchCloudMeasurements(token: string) {
+  return request<{ measurements: Measurement[] }>('/api/data/measurements', { token });
+}
+
+export function syncCloudMeasurements(token: string, measurements: Measurement[]) {
+  return request<{ measurements: Measurement[] }>('/api/data/measurements', {
+    method: 'PUT',
+    body: { measurements },
+    token,
+  });
+}
+
+export function fetchCloudProfile(token: string) {
+  return request<{ profile: Profile | null }>('/api/data/profile', { token });
+}
+
+export function syncCloudProfile(token: string, profile: Profile) {
+  return request<{ profile: Profile | null }>('/api/data/profile', { method: 'PUT', body: { profile }, token });
+}
+
+export function fetchCloudReminders(token: string) {
+  return request<{ reminders: Reminder[] }>('/api/data/reminders', { token });
+}
+
+export function syncCloudReminders(token: string, reminders: Reminder[]) {
+  return request<{ reminders: Reminder[] }>('/api/data/reminders', {
+    method: 'PUT',
+    body: { reminders },
     token,
   });
 }

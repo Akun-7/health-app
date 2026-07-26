@@ -7,6 +7,7 @@ import { signToken } from './auth';
 import { requireAuth } from './authMiddleware';
 import type { AuthedRequest } from './authMiddleware';
 import { createChatRouter } from './chatRoutes';
+import { createDataRouter } from './dataRoutes';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 6;
@@ -62,6 +63,7 @@ export function createApp() {
   });
 
   app.use('/api/chat', createChatRouter());
+  app.use('/api/data', createDataRouter());
 
   return app;
 }

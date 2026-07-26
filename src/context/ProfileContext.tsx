@@ -1,6 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Profile } from '../data/profile';
+import { useAuth } from './AuthContext';
+import { fetchCloudProfile, syncCloudProfile } from '../api/client';
 
 const STORAGE_KEY = 'health-app/profile';
 
@@ -13,20 +15,68 @@ type ProfileContextValue = {
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
+  const { token, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [localReady, setLocalReady] = useState(false);
+  const hasLocalRef = useRef(false);
+  const syncedRef = useRef(false);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
       .then((raw) => {
-        if (raw) setProfile(JSON.parse(raw));
+        if (raw) {
+          hasLocalRef.current = true;
+          setProfile(JSON.parse(raw));
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLocalReady(true));
   }, []);
+
+  // Same reasoning as MeasurementsContext: don't block the UI on the network
+  // if a local profile already exists, but do wait for the server on a
+  // fresh device — that's the actual "phone lost" recovery case.
+  useEffect(() => {
+    if (!localReady || authLoading || syncedRef.current) return;
+    syncedRef.current = true;
+
+    if (hasLocalRef.current) {
+      setLoading(false);
+      if (!token) return;
+      fetchCloudProfile(token)
+        .then(({ profile: remote }) => {
+          if (remote) {
+            setProfile(remote);
+            AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+          } else {
+            AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+              if (raw) syncCloudProfile(token, JSON.parse(raw)).catch(() => {});
+            });
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    fetchCloudProfile(token)
+      .then(({ profile: remote }) => {
+        if (remote) {
+          setProfile(remote);
+          AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [localReady, authLoading, token]);
 
   async function saveProfile(next: Profile) {
     setProfile(next);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    if (token) syncCloudProfile(token, next).catch(() => {});
   }
 
   const value = useMemo(() => ({ profile, loading, saveProfile }), [profile, loading]);

@@ -1,10 +1,12 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Measurement } from '../data/measurements';
 import { formatMeasurementValue } from '../data/measurements';
 import { classify } from '../data/insights';
 import { sendThresholdAlert } from '../notifications/thresholdAlerts';
 import { useLocale } from './LocaleContext';
+import { useAuth } from './AuthContext';
+import { fetchCloudMeasurements, syncCloudMeasurements } from '../api/client';
 import type { TranslationKey } from '../i18n/ky';
 
 const STORAGE_KEY = 'health-app/measurements';
@@ -25,16 +27,70 @@ const MeasurementsContext = createContext<MeasurementsContextValue | null>(null)
 
 export function MeasurementsProvider({ children }: { children: React.ReactNode }) {
   const { t } = useLocale();
+  const { token, loading: authLoading } = useAuth();
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [localReady, setLocalReady] = useState(false);
+  const hasLocalRef = useRef(false);
+  const syncedRef = useRef(false);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
       .then((raw) => {
-        if (raw) setMeasurements(JSON.parse(raw));
+        if (raw) {
+          hasLocalRef.current = true;
+          setMeasurements(JSON.parse(raw));
+        }
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLocalReady(true));
   }, []);
+
+  // Cloud sync: if this device already has local data, show it immediately
+  // and reconcile with the server quietly. If local is empty, this could be
+  // a fresh device recovering an account (phone-loss scenario) — wait for
+  // the server response before deciding there's really nothing to show.
+  useEffect(() => {
+    if (!localReady || authLoading || syncedRef.current) return;
+    syncedRef.current = true;
+
+    if (hasLocalRef.current) {
+      setLoading(false);
+      if (!token) return;
+      fetchCloudMeasurements(token)
+        .then(({ measurements: remote }) => {
+          if (remote.length > 0) {
+            setMeasurements(remote);
+            AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+          } else {
+            AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+              if (raw) syncCloudMeasurements(token, JSON.parse(raw)).catch(() => {});
+            });
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    fetchCloudMeasurements(token)
+      .then(({ measurements: remote }) => {
+        if (remote.length > 0) {
+          setMeasurements(remote);
+          AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [localReady, authLoading, token]);
+
+  async function persist(next: Measurement[]) {
+    setMeasurements(next);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    if (token) syncCloudMeasurements(token, next).catch(() => {});
+  }
 
   async function addMeasurement(input: NewMeasurement) {
     const measurement = {
@@ -43,9 +99,7 @@ export function MeasurementsProvider({ children }: { children: React.ReactNode }
       createdAt: Date.now(),
     } as Measurement;
 
-    const next = [measurement, ...measurements];
-    setMeasurements(next);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    await persist([measurement, ...measurements]);
 
     if (classify(measurement) === 'concern') {
       const label = t(`measurement.${measurement.type}` as TranslationKey);
@@ -56,8 +110,7 @@ export function MeasurementsProvider({ children }: { children: React.ReactNode }
   }
 
   async function clearAll() {
-    setMeasurements([]);
-    await AsyncStorage.removeItem(STORAGE_KEY);
+    await persist([]);
   }
 
   const value = useMemo(
