@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { dataFilePath } from './dataDir';
 
 export type UserRole = 'patient' | 'doctor';
 
@@ -11,7 +12,7 @@ export type User = {
   createdAt: number;
 };
 
-const DB_PATH = path.join(__dirname, '..', 'data', 'users.json');
+const DB_PATH = dataFilePath('users.json');
 
 function load(): User[] {
   if (!fs.existsSync(DB_PATH)) return [];

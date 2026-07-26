@@ -1,7 +1,12 @@
 import jwt from 'jsonwebtoken';
 
-// Dev-only local server — a fixed fallback secret is fine here since this
-// never leaves the developer's machine. Override with JWT_SECRET if needed.
+// The fixed fallback secret is only safe for local dev, where the server
+// never leaves the developer's machine. Production deploys must set a real
+// JWT_SECRET — we refuse to start rather than silently sign tokens with a
+// secret that's public in this repo's history.
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET env variable is required when NODE_ENV=production');
+}
 const JWT_SECRET = process.env.JWT_SECRET || 'health-app-dev-secret-local-only';
 const TOKEN_TTL = '30d';
 

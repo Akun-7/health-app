@@ -29,7 +29,7 @@
   - `StepsContext` → `health-app/steps` (учурдагы күндүн кадам саны)
   - `SleepContext` → (өзү сактабайт, `src/sleep/sleepSampling.ts`деги `health-app/sleepSamples`ди окуйт)
   - **Zustand, Redux, Prisma, PostgreSQL — колдонулбайт.** (Мурунку талкууда сунушталган, бирок иш жүзүндө башка жол тандалган.)
-- **Backend/auth:** `server/` — Express + TypeScript, `tsx` менен иштейт (`npm run dev` — `server/`дин ичинде). Колдонуучулар `server/data/users.json` файлында сакталат (JSON, native DB эмес — `better-sqlite3` бул машинада Visual Studio Build Tools жоктугунан compile болбойт, ошондуктан колдонулбайт). Пароль `bcryptjs` менен hash'делет, сессия `jsonwebtoken` (`JWT_SECRET` env, дефолт — dev-only туруктуу сыр сөз). Ар бир колдонуучунун `role: 'patient' | 'doctor'` талаасы бар (signup'та тандалат, эч кандай текшерүү жок). Эндпоинттер: `POST /api/auth/signup` (`{email,password,role?}`), `POST /api/auth/login`, `GET /api/auth/me` (`Authorization: Bearer <token>`); чат — `GET/POST /api/chat/messages` (пациенттин өз thread'и), `GET /api/chat/threads` (дарыгер-гана, бардык пациенттердин тизмеси), `GET/POST /api/chat/messages/:patientId` (дарыгер-гана, белгилүү пациенттин thread'и). `requireAuth`/`AuthedRequest` `server/src/authMiddleware.ts`де — `app.ts` менен `chatRoutes.ts`нин ортосундагы circular import'ту болтурбоо үчүн өзүнчө файлга бөлүнгөн. `src/api/client.ts` серверди `expo-constants`теги `hostUri`ден LAN IP'ди алып табат (телефон/веб экөө тең иштеши үчүн), порт 4000ге катуу коюлган.
+- **Backend/auth:** `server/` — Express + TypeScript, `tsx` менен иштейт (`npm run dev` — `server/`дин ичинде). Колдонуучулар `server/data/users.json` файлында сакталат (JSON, native DB эмес — `better-sqlite3` бул машинада Visual Studio Build Tools жоктугунан compile болбойт, ошондуктан колдонулбайт). JSON-файлдын жайгашкан жери `server/src/dataDir.ts`теги `dataFilePath()` аркылуу аныкталат — дефолт `server/data/`, бирок `DATA_DIR` env коюлса ошол жерге жазат (cloud'до persistent volume'го көрсөтүү үчүн). Пароль `bcryptjs` менен hash'делет, сессия `jsonwebtoken` (`JWT_SECRET` env; локалдуу dev'де дефолт туруктуу сыр сөз колдонулат, бирок `NODE_ENV=production`де `JWT_SECRET` жок болсо сервер асти иштебей, дароо катачылык менен токтойт — `server/src/auth.ts`). Ар бир колдонуучунун `role: 'patient' | 'doctor'` талаасы бар (signup'та тандалат, эч кандай текшерүү жок). Эндпоинттер: `POST /api/auth/signup` (`{email,password,role?}`), `POST /api/auth/login`, `GET /api/auth/me` (`Authorization: Bearer <token>`); чат — `GET/POST /api/chat/messages` (пациенттин өз thread'и), `GET /api/chat/threads` (дарыгер-гана, бардык пациенттердин тизмеси), `GET/POST /api/chat/messages/:patientId` (дарыгер-гана, белгилүү пациенттин thread'и). `requireAuth`/`AuthedRequest` `server/src/authMiddleware.ts`де — `app.ts` менен `chatRoutes.ts`нин ортосундагы circular import'ту болтурбоо үчүн өзүнчө файлга бөлүнгөн. `src/api/client.ts` серверди `expo-constants`теги `hostUri`ден LAN IP'ди алып табат (телефон/веб экөө тең иштеши үчүн), порт 4000ге катуу коюлган; эгер `EXPO_PUBLIC_API_URL` build-time env коюлса, ал LAN-IP логикадан мурда артыкчылык алат (production build'дер cloud серверге ушул аркылуу көрсөтөт).
 - **i18n:** `src/i18n/{ky,ru,en}.ts` — тегиз (dot-namespaced) ачкычтуу сөздүктөр, `ky.ts` канондук (`TranslationKey` ушундан чыгарылат, `ru`/`en` `Record<TranslationKey, string>` менен толуктугу текшерилет). `LocaleContext`деги `t(key, params?)` `{param}` интерполяциясын колдойт. Тил тандагычта ар бир тил өз энчилүү атында көрсөтүлөт (`localeNativeName`), учурдагы тилге которулбайт.
 - **Иконкалар:** `@tabler/icons-react-native`
 - **Билдирмелер (reminders):** `expo-notifications`, логика `src/notifications/reminderNotifications.ts` ичинде
@@ -51,6 +51,22 @@
 
 ⚠️ **Bluetooth'ту текшерүү үчүн Expo Go жетишсиз** — `react-native-ble-plx` native код талап кылат. Керек болот: `eas login` (колдонуучунун өз Expo аккаунту менен), `eas build:configure`, `eas build --platform android --profile development` (профиль `eas.json`де даяр). Курулган APK'ды телефонго орнотуп, андан кийин `npx expo start --dev-client` менен туташуу. Бул компьютерде Android SDK/gradle/Java жок (текшерилди, 2026-07-26) — локалдуу build мүмкүн эмес, EAS Build (cloud) гана жол. Expo access token'дерди Claude'го эч качан түз бербеңиз (чат билдирүүсү катары да, `!` командасынын ичинде да) — эки жолу ушундай окуя болгон, экөө тең revoke кылынышы керек болчу.
 
+## Cloud'го деплой кылуу (Render.com, "Production readiness" #1)
+
+Баштапкы план Fly.io болчу, бирок 2026-07-26да колдонуучу Fly.io'дун аккаунт-текшерүү (карта, коопсуздук верификациясы) талаптары өтө татаал болгонун белгилеп, **Render.com'дун акысыз tier'ине которулду**. Render'дин акысыз web service'инде persistent disk жок (Fly.io'дон айырмасы) — колдонуучу менен талкууланып, **азырынча ephemeral сактоону кабыл алуу чечилди**: JSON-файлдар `server/data/`де сакталат, бирок ар бир redeploy/restart сайын тазаланат (бардык колдонуучулар/чат жоголот). Бул CLAUDE.mdдеги #2 приоритет ("дайын жоготуу тобокелдиги") менен түз байланышкан — ал бул жерде дароо, "телефон жоголсо" эмес, "сервер кайра иштетилсе" деңгээлинде көрүнөт; чыныгы колдонуучулар үчүн production'го чыгаардын алдында чечилиши МИЛДЕТТҮҪ.
+
+Кодго даярдык: `server/src/dataDir.ts` (JSON-файлдардын жерин `DATA_DIR` env менен которуштурат — Render'де колдонулбайт, бирок келечекте VPS/paid disk'ке которгондо пайдалуу), `server/src/auth.ts`деги production fail-fast (`JWT_SECRET` жок болсо сервер иштебейт), `server/Dockerfile` (Render Docker environment'ын колдойт), `server/render.yaml` (Render Blueprint — repo'до болсо dashboard автоматтык окуйт), жана `src/api/client.ts`теги `EXPO_PUBLIC_API_URL` override.
+
+**Иш жүзүндө деплой болгон эмес** — мурункудай эле себеп: Render dashboard'го кирүү/GitHub'ду туташтыруу/secret коюу browser аркылуу болот, Claude Code'дун Bash sandbox'у чыныгы desktop браузер менен сессияны бөлүшпөйт, ошондуктан төмөнкү кадамдарды **колдонуучунун өзү** браузеринде жасашы керек:
+
+1. https://render.com'го GitHub аккаунт менен катталуу/кирүү
+2. Dashboard'до **New +** → **Blueprint** → бул репозиторийди тандоо — Render `server/render.yaml`ды автоматтык таап, `healthtrack-api` аттуу Docker web service сунуштайт (root directory `server` катары көрсөтүлүшү керек, эгер Render автоматтык тапбаса)
+3. Тандоону ырастаардан мурун **JWT_SECRET** env variable'ды толтуруу сурала турган талаага өзүңүз ойлоп тапкан узун кокус сапты коюу (бул `render.yaml`де `sync: false` менен белгиленген — б.а. git'ке эмес, тек dashboard'го)
+4. **Apply**/**Deploy** басуу — Render `Dockerfile`ди колдонуп build кылат, автоматтык HTTPS менен `https://healthtrack-api.onrender.com` (же окшош) URL берет
+5. Деплой бүткөндөн кийин ошол URL'ди `EXPO_PUBLIC_API_URL` катары `.env`ге же `eas.json`деги `build.production.env`ге кош — андан кийинки production build'дер cloud серверди колдонот, LAN IP'ди эмес
+
+⚠️ Акысыз tier'де сервер 15 мүнөт активсиз болсо "уктайт" — кийинки сурам ~30-50 секунд "cold start" күтөт. Render'дин акысыз tier шарттары (эрежелер, лимиттер) убакыттын өтүшү менен өзгөрүшү мүмкүн — деплоо алдында https://render.com/pricing текшериңиз.
+
 ## Папка структурасы (иш жүзүндөгү)
 
 ```
@@ -71,14 +87,17 @@ health-app/
     screens/          — Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth, Sleep
     theme/            — colors, typography, spacing, radii, ThemeProvider
   server/            — локалдуу Express auth+chat сервери (өз package.json'у, health-app'тин ичине кирбейт)
+    Dockerfile        — cloud деплой үчүн (Render Docker environment), `npm install` + `tsx` менен иштетет
+    render.yaml        — Render Blueprint (dashboard'до "New + Blueprint" ушуну автоматтык окуйт)
     src/
-      index.ts        — listen(0.0.0.0:4000)
+      index.ts        — listen(0.0.0.0:PORT)
       app.ts           — Express app + auth routes (signup/login/me)
       authMiddleware.ts — requireAuth (app.ts менен chatRoutes.ts экөө тең колдонот)
       chatRoutes.ts     — /api/chat/* (requireDoctor гейт менен)
-      auth.ts          — JWT sign/verify
-      userStore.ts      — data/users.json'го окуу/жазуу (role талаасы менен)
-      chatStore.ts      — data/messages.json'го окуу/жазуу
+      auth.ts          — JWT sign/verify, production'до JWT_SECRET жоктон fail-fast
+      dataDir.ts        — JSON-файлдардын жайгашкан жерин аныктайт (`DATA_DIR` env же дефолт `data/`)
+      userStore.ts      — users.json'го окуу/жазуу (role талаасы менен)
+      chatStore.ts      — messages.json'го окуу/жазуу
 ```
 
 ## Дайын модели (учурда)
@@ -121,6 +140,19 @@ CLAUDE.mdде баштапкы белгиленген бардык "кийинк
 **"Кадам эсептегич" жөнүндө эскертүү:** iOS'до так (`Pedometer.getStepCountAsync` тарыхый маалымат берет), бирок **Android'до так эмес** — `watchStepCount()` delta-негизделген API, тиркеме фондо/жабык турганда эсептебейт (OS тиркемени өлтүрсө, ошол аралыктагы кадамдар такыр эсепке кирбейт). `ACTIVITY_RECOGNITION` уруксаты сурала турган өзүнчө UI жок, Expo'нун демейки `Pedometer` жүрүм-турумуна таянылат.
 
 **"Уйку эсептегич" жөнүндө эскертүү:** Бул эң эксперименталдык бөлүк. `expo-background-task`деги `minimumInterval: 15` (мүнөт) — **гарантия эмес, сунуш гана**; Android/iOS батарея-үнөмдөө саясаттарына жараша OS бул тапшырманы саат бою же андан көп мезгилге чейин токтото алат, же такыр иштетпей коюшу мүмкүн. Бул себептен фондук аткарылуу бир сессия ичинде текшерилген эмес — `SleepScreen`деги "Азыр текшерүү" баскычы аркылуу гана өлчөө/классификация логикасынын өзү (акселерометр дисперсиясы → `still`/эмес) текшерилди. Так уйку эмес, "телефон 3+ саат кыймылсыз жатты" эвристикасы гана — телефон колдо эмес же зарядкада башка бөлмөдө жатса, туура эмес натыйжа берет.
+
+## Production readiness — чыныгы колдонуучу үчүн жетишсиз жерлер (пландалган, приоритети боюнча)
+
+Колдонуучу менен 2026-07-26да талкууланды: бардык MVP+кийинки-фаза функциялары "бүттү" болгону менен, тиркеме дагы эле **чыныгы колдонуучу колдоно турган продукт эмес** — прототип. Приоритети боюнча (жогорку — эң маанилүү, калгандары ушуга көз каранды):
+
+1. **Backend cloud'го deploy кылуу (эң маанилүү, бөгөт-тоскоол) — код жагы даяр, деплой күтүлүүдө:** Fly.io'дон Render.com'дун акысыз tier'ине которулду (Fly'дын аккаунт-верификация талаптары татаал болгону үчүн; толук деталь — жогорудагы "Cloud'го деплой кылуу (Render.com)" бөлүмүн кара). `dataFilePath()`/`DATA_DIR`, production `JWT_SECRET` fail-fast, `Dockerfile`, `render.yaml`, `EXPO_PUBLIC_API_URL` override — баары кодго кирди жана typecheck'тен өттү. **Эскертүү:** Render'дин акысыз tier'инде persistent disk жок — ephemeral сактоо азырынча кабыл алынды (толук деталь жогорудагы бөлүмдө, #2 пункт менен байланышы бар). Dashboard'до Blueprint deploy кылуу жана `JWT_SECRET` коюу **колдонуучунун өзү** тарабынан жасалышы керек болгондуктан, чыныгы деплой азырынча болгон эмес — сервер дагы эле ушул компьютерде, локалдуу LAN'да гана иштейт.
+2. **Дайын жоготуу тобокелдиги:** Бардык өлчөө/тарых/профиль тек `AsyncStorage`до (бир гана телефондо). Телефон жоголсо/бузулса/тиркеме кайра орнотулса — бардык медициналык тарых калыбына келтирилбейт. Чечими: cloud backend'ге дайын синхрондоштуруу (1-пункт бүткөндөн кийин гана мүмкүн).
+3. **Коопсуздук:** AsyncStorage'дагы медициналык дайын шифрленбейт; `JWT_SECRET`дин dev-only дефолт мааниси бар (production'до дагы эле колдонулса — коркунучтуу); сырсөз калыбына келтирүү (forgot password) жок; "Мен дарыгермин" checkbox'ун эч ким текшербейт (бул production'до өзгөчө коркунучтуу — медициналык кеңеш берүү контекстинде).
+4. **Ишенимдүүлүк:** Android'до (Xiaomi/Huawei ж.б. батарея-үнөмдөө агрессивдүү бренддерде) фондук эскертмелер/уйку-трекинг дагы эле тестирленген эмес (жогорудагы эскертүүлөрдү кара — "Уйку эсептегич", "Кадам эсептегич"). Автоматтык тесттер (unit/integration) такыр жок.
+5. **Улгайган колдонуучуга ылайыктоо:** Чоң тамга/жогорку контраст режими, биринчи ачылууда түшүндүрүү (onboarding) жок — CLAUDE.mdдеги максаттуу аудитория ("орто жаштагы жана улгайган колдонуучулар") менен интерфейстин татаалдыгы дал келбейт.
+6. **Play Store'го чыгарууга даярдык:** Купуялык саясаты (privacy policy), пайдалануу шарттары жок — "медициналык" категория Google тарабынан өзгөчө көзөмөлдөнөт, булар милдеттүү болот.
+
+Бул тизмеге эч бир код жазылган жок — CLAUDE.mdге белгиленди, ар бир пункт Claude Code'го өзүнчө, ирети менен (1ден баштап) тапшырма катары берилиши керек.
 
 ## Эскертүү
 

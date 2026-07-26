@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { findById } from './userStore';
 import type { UserRole } from './userStore';
+import { dataFilePath } from './dataDir';
 
 export type Message = {
   id: string;
@@ -19,7 +20,7 @@ export type ThreadSummary = {
   lastMessageAt: number;
 };
 
-const DB_PATH = path.join(__dirname, '..', 'data', 'messages.json');
+const DB_PATH = dataFilePath('messages.json');
 
 function load(): Message[] {
   if (!fs.existsSync(DB_PATH)) return [];

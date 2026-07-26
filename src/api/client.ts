@@ -3,7 +3,12 @@ import Constants from 'expo-constants';
 
 const API_PORT = 4000;
 
+// Production/EAS builds bake this in at build time (see .env / eas.json env)
+// and it takes priority over the LAN-IP guess used for local dev.
+const PRODUCTION_API_URL = process.env.EXPO_PUBLIC_API_URL;
+
 function resolveBaseUrl(): string {
+  if (PRODUCTION_API_URL) return PRODUCTION_API_URL;
   if (Platform.OS === 'web') return `http://localhost:${API_PORT}`;
   const hostUri = Constants.expoConfig?.hostUri;
   const host = hostUri?.split(':')[0] ?? 'localhost';
