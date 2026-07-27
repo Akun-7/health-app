@@ -14,6 +14,7 @@ export const ru: Record<TranslationKey, string> = {
   'login.errorRequired': 'Заполните email и пароль',
   'login.submit': 'Войти',
   'login.createAccount': 'Создать аккаунт',
+  'login.forgotPassword': 'Забыли пароль?',
 
   'signup.title': 'Создать аккаунт',
   'signup.subtitle': 'Зарегистрируйтесь, чтобы следить за здоровьем',
@@ -27,6 +28,24 @@ export const ru: Record<TranslationKey, string> = {
   'auth.emailTaken': 'Аккаунт с таким email уже существует',
   'auth.invalidCredentials': 'Неверный email или пароль',
   'auth.networkError': 'Не удалось подключиться к серверу. Проверьте, запущен ли сервер.',
+
+  'forgotPassword.title': 'Восстановление пароля',
+  'forgotPassword.subtitle': 'Введите email, указанный при регистрации — мы отправим код для восстановления',
+  'forgotPassword.submit': 'Отправить код',
+  'forgotPassword.sent': 'Если аккаунт с этим email существует, на него отправлен код восстановления пароля (действителен 1 час).',
+  'forgotPassword.enterCode': 'Ввести код',
+  'forgotPassword.backToLogin': 'Вернуться ко входу',
+
+  'resetPassword.title': 'Новый пароль',
+  'resetPassword.subtitle': 'Введите код из письма и новый пароль',
+  'resetPassword.emailLabel': 'Email',
+  'resetPassword.codeLabel': 'Код',
+  'resetPassword.codePlaceholder': 'XXXXXXXX',
+  'resetPassword.newPasswordLabel': 'Новый пароль',
+  'resetPassword.confirmPasswordLabel': 'Повторите новый пароль',
+  'resetPassword.submit': 'Обновить пароль',
+  'resetPassword.errorMismatch': 'Пароли не совпадают',
+  'resetPassword.invalidCode': 'Код неверный или срок его действия истёк',
 
   'profileSetup.titleCreate': 'Заполните профиль',
   'profileSetup.titleEdit': 'Изменить профиль',

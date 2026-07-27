@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { secureStorage } from '../storage/secureStorage';
 import * as Notifications from 'expo-notifications';
 import type { ReminderLogEntry, AdherenceStatus } from '../data/reminderLog';
 
@@ -23,7 +23,7 @@ export function ReminderLogProvider({ children }: { children: React.ReactNode })
   const logRef = useRef<ReminderLogEntry[]>([]);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
+    secureStorage.getItem(STORAGE_KEY)
       .then((raw) => {
         if (raw) {
           const parsed = JSON.parse(raw);
@@ -37,7 +37,7 @@ export function ReminderLogProvider({ children }: { children: React.ReactNode })
   async function persist(next: ReminderLogEntry[]) {
     logRef.current = next;
     setLog(next);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    await secureStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   }
 
   async function logEntry(reminderId: string, status: AdherenceStatus) {

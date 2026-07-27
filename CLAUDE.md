@@ -18,10 +18,10 @@
 - **Mobile:** Expo SDK ~54 (2026-07-25'тен баштап; мурун 57 эле, физикалык түзмөктөгү Expo Go'нун SDK 54'кө чейин гана колдогонуна байланыштуу түшүрүлдү), React Native 0.81, React 19.1, TypeScript
 - **Навигация:** `@react-navigation/native` + `native-stack` (v7) — бир гана `RootNavigator` (`src/navigation/RootNavigator.tsx`), stack ичинде экрандар: Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth, Sleep. Баштапкы route `AuthContext`/`ProfileContext`нин `loading` бүткөндөн кийин эсептелет: `!user` → Login, `user.role === 'doctor'` → DoctorInbox (ProfileSetup/Dashboard такыр четтелет), `!profile` → ProfileSetup, экинчиси → Dashboard.
 - **State/сактоо:** React Context (`createContext`/`useContext`) ар бир домен үчүн өзүнчө provider, дайыма `@react-native-async-storage/async-storage` менен персистенттелет. `App.tsx` алардын баарын `ComposeProviders` (`src/context/ComposeProviders.tsx`) аркылуу бириктирет — провайдер саны көбөйүп, кол менен вложить кылуу окулбай калгандан кийин кошулган; жаны context кошсоңуз ошол массивге кош, кол менен JSX-вложить кылба:
-  - `MeasurementsContext` → `health-app/measurements` (2026-07-26дан баштап cloud'го дагы синхрондошот — төмөндөгү "Cloud'го синхрондоштуруу" бөлүмүн кара)
-  - `ProfileContext` → `health-app/profile` (cloud sync бар, жогорудагыдай эле)
-  - `RemindersContext` → `health-app/reminders` (cloud sync бар, notification'дор дагы эле локалдуу)
-  - `ReminderLogContext` → `health-app/reminderLog` (дары/эскертме аткарылуу тарыхы: `taken`/`skipped` + убакыт)
+  - `MeasurementsContext` → `health-app/measurements` (2026-07-26дан баштап cloud'го дагы синхрондошот жана `secureStorage` менен шифрленет — тиешелүү бөлүмдөрдү кара)
+  - `ProfileContext` → `health-app/profile` (cloud sync + шифрлөө бар, жогорудагыдай эле)
+  - `RemindersContext` → `health-app/reminders` (cloud sync + шифрлөө бар, notification'дор дагы эле локалдуу)
+  - `ReminderLogContext` → `health-app/reminderLog` (дары/эскертме аткарылуу тарыхы: `taken`/`skipped` + убакыт; шифрленет, cloud sync жок)
   - `SettingsContext` → `health-app/settings`
   - `LocaleContext` → `health-app/locale`
   - `AuthContext` → `health-app/authToken` (JWT гана сакталат; `user` объектиси серверден `/api/auth/me` менен алынат)
@@ -29,7 +29,8 @@
   - `StepsContext` → `health-app/steps` (учурдагы күндүн кадам саны)
   - `SleepContext` → (өзү сактабайт, `src/sleep/sleepSampling.ts`деги `health-app/sleepSamples`ди окуйт)
   - **Zustand, Redux, Prisma, PostgreSQL — колдонулбайт.** (Мурунку талкууда сунушталган, бирок иш жүзүндө башка жол тандалган.)
-- **Backend/auth:** `server/` — Express + TypeScript, `tsx` менен иштейт (`npm run dev` — `server/`дин ичинде). Колдонуучулар `server/data/users.json` файлында сакталат (JSON, native DB эмес — `better-sqlite3` бул машинада Visual Studio Build Tools жоктугунан compile болбойт, ошондуктан колдонулбайт). JSON-файлдын жайгашкан жери `server/src/dataDir.ts`теги `dataFilePath()` аркылуу аныкталат — дефолт `server/data/`, бирок `DATA_DIR` env коюлса ошол жерге жазат (cloud'до persistent volume'го көрсөтүү үчүн). Пароль `bcryptjs` менен hash'делет, сессия `jsonwebtoken` (`JWT_SECRET` env; локалдуу dev'де дефолт туруктуу сыр сөз колдонулат, бирок `NODE_ENV=production`де `JWT_SECRET` жок болсо сервер асти иштебей, дароо катачылык менен токтойт — `server/src/auth.ts`). Ар бир колдонуучунун `role: 'patient' | 'doctor'` талаасы бар (signup'та тандалат, эч кандай текшерүү жок). Эндпоинттер: `POST /api/auth/signup` (`{email,password,role?}`), `POST /api/auth/login`, `GET /api/auth/me` (`Authorization: Bearer <token>`); чат — `GET/POST /api/chat/messages` (пациенттин өз thread'и), `GET /api/chat/threads` (дарыгер-гана, бардык пациенттердин тизмеси), `GET/POST /api/chat/messages/:patientId` (дарыгер-гана, белгилүү пациенттин thread'и). `requireAuth`/`AuthedRequest` `server/src/authMiddleware.ts`де — `app.ts` менен `chatRoutes.ts`нин ортосундагы circular import'ту болтурбоо үчүн өзүнчө файлга бөлүнгөн. `src/api/client.ts` серверди `expo-constants`теги `hostUri`ден LAN IP'ди алып табат (телефон/веб экөө тең иштеши үчүн), порт 4000ге катуу коюлган; эгер `EXPO_PUBLIC_API_URL` build-time env коюлса, ал LAN-IP логикадан мурда артыкчылык алат (production build'дер cloud серверге ушул аркылуу көрсөтөт).
+- **Backend/auth:** `server/` — Express + TypeScript, `tsx` менен иштейт (`npm run dev` — `server/`дин ичинде). Колдонуучулар `server/data/users.json` файлында сакталат (JSON, native DB эмес — `better-sqlite3` бул машинада Visual Studio Build Tools жоктугунан compile болбойт, ошондуктан колдонулбайт). JSON-файлдын жайгашкан жери `server/src/dataDir.ts`теги `dataFilePath()` аркылуу аныкталат — дефолт `server/data/`, бирок `DATA_DIR` env коюлса ошол жерге жазат (cloud'до persistent volume'го көрсөтүү үчүн). Пароль `bcryptjs` менен hash'делет, сессия `jsonwebtoken` (`JWT_SECRET` env; локалдуу dev'де дефолт туруктуу сыр сөз колдонулат, бирок `NODE_ENV=production`де `JWT_SECRET` жок болсо сервер асти иштебей, дароо катачылык менен токтойт — `server/src/auth.ts`). Ар бир колдонуучунун `role: 'patient' | 'doctor'` талаасы бар (signup'та тандалат, эч кандай текшерүү жок). Эндпоинттер: `POST /api/auth/signup` (`{email,password,role?}`), `POST /api/auth/login`, `GET /api/auth/me` (`Authorization: Bearer <token>`); чат — `GET/POST /api/chat/messages` (пациенттин өз thread'и), `GET /api/chat/threads` (дарыгер-гана, бардык пациенттердин тизмеси), `GET/POST /api/chat/messages/:patientId` (дарыгер-гана, белгилүү пациенттин thread'и). `requireAuth`/`AuthedRequest` `server/src/authMiddleware.ts`де — `app.ts` менен `chatRoutes.ts`нин ортосундагы circular import'ту болтурбоо үчүн өзүнчө файлга бөлүнгөн. `src/api/client.ts` серверди `expo-constants`теги `hostUri`ден LAN IP'ди алып табат (телефон/веб экөө тең иштеши үчүн), порт 4000ге катуу коюлган; эгер `EXPO_PUBLIC_API_URL` build-time env коюлса, ал LAN-IP логикадан мурда артыкчылык алат (production build'дер cloud серверге ушул аркылуу көрсөтөт). Сырсөз калыбына келтирүү: `POST /api/auth/forgot-password` (`{email}`, аккаунт бар/жогун ачыкка чыгарбоо үчүн дайыма `{ok:true}` кайтарат), `POST /api/auth/reset-password` (`{email,code,newPassword}`) — толук деталь төмөндөгү "Шифрлөө жана сырсөз калыбына келтирүү" бөлүмүндө.
+- **Коопсуздук (шифрлөө):** `src/storage/secureStorage.ts` — `AsyncStorage`ге жазаардын ордуна колдонулуучу drop-in wrapper, Measurements/Profile/Reminders/ReminderLog контексттери мунун баары колдонот. Ачкыч `expo-secure-store` (OS keychain/keystore) аркылуу сакталат, дайын өзү `crypto-js`теги AES-CBC менен шифрленет (IV ар бир жазуу үчүн `expo-crypto`деги `getRandomBytesAsync` менен жаны түзүлөт). Веб платформада (`Platform.OS === 'web'`) `expo-secure-store` иштебегендиктен, шифрлөө өчүрүлүп, жөнөкөй `AsyncStorage` колдонулат.
 - **i18n:** `src/i18n/{ky,ru,en}.ts` — тегиз (dot-namespaced) ачкычтуу сөздүктөр, `ky.ts` канондук (`TranslationKey` ушундан чыгарылат, `ru`/`en` `Record<TranslationKey, string>` менен толуктугу текшерилет). `LocaleContext`деги `t(key, params?)` `{param}` интерполяциясын колдойт. Тил тандагычта ар бир тил өз энчилүү атында көрсөтүлөт (`localeNativeName`), учурдагы тилге которулбайт.
 - **Иконкалар:** `@tabler/icons-react-native`
 - **Билдирмелер (reminders):** `expo-notifications`, логика `src/notifications/reminderNotifications.ts` ичинде
@@ -82,6 +83,21 @@
 
 Backend жагындагы дайын ошол эле "Cloud'го деплой кылуу" бөлүмүндөгү ephemeral-tradeoff'ко таянат — Render redeploy/restart кылса, бул синхрондоштурулган дайын да жоголот (толук чечим — persistent disk же чыныгы DB, азырынча кабыл алынган эмес).
 
+## Шифрлөө жана сырсөз калыбына келтирүү ("Production readiness" #3)
+
+2026-07-27да ишке ашырылды. Дарыгер каттоосун лицензия менен текшерүү маселеси колдонуучунун так суроосу боюнча **атайылап четке коюлду** — ал өзүнчө чоң чечим, "Телемедицина жөнүндө эскертүү" бөлүмүндөгүдөй эле бойдон калды.
+
+**Шифрлөө:** `src/storage/secureStorage.ts` — `getItem`/`setItem`/`removeItem` (AsyncStorage менен дал келген интерфейс). Ачкыч (`expo-crypto`теги `getRandomBytesAsync` менен түзүлгөн 256-bit кокус) `expo-secure-store` аркылуу OS keychain/keystore'до сакталат — JS-канчыл эмес, native секретке гана мүмкүнчүлүк. Ар бир жазуу `crypto-js`теги AES-CBC + жаны кокус IV менен шифрленип, `enc1:<ivHex>:<base64>` форматында AsyncStorage'ге жазылат. **Артка шайкештик:** эски (2026-07-27ге чейин жазылган) plaintext JSON дайын `enc1:` префикси жок болгондуктан, `getItem` аны таанып, шифрлебестен кайтарат — колдонуучунун учурдагы дайыны жоголбойт, кийинки `setItem`де автоматтык шифрленет.
+
+**Сырсөз калыбына келтирүү:** Resend (https://resend.com) email API аркылуу — `server/src/email.ts`теги `sendPasswordResetEmail()`. `RESEND_API_KEY` env жок болсо (мис. локалдуу dev), email жөнөтүлбөйт, орду консолго `[dev] password reset code for <email>: <CODE>` деп жазылат — ушундай жол менен email инфраструктурасыз эле агым сыналат. `POST /api/auth/forgot-password` 8 белгилүү кокус код (`ABCDEFGHJKMNPQRSTUVWXYZ23456789` алфавитинен — 0/O/1/I/L алынып салынган, окууга ыңгайлуу үчүн) түзөт, sha256 hash'ин колдонуучунун жазуусуна сактайт (1 саат мөөнөт), эч качан аккаунт бар/жогун ачыкка чыгарбайт (дайыма `{ok:true}`). `POST /api/auth/reset-password` кодду текшерет, сырсөздү жаңыртат, жаны JWT кайтарат — мобилдик тарапта `ResetPasswordScreen` муну `AuthContext.applySession()` менен дароо колдонуучуну кийирет (кайра login кылуунун кереги жок). Мобилдик экрандар: `ForgotPasswordScreen` (email → код сурам), `ResetPasswordScreen` (код+жаны сырсөз).
+
+⚠️ **Чектөөлөр (атайылап жөнөкөйлөтүлгөн):**
+- Код 8 белгиден турат, кайра аракет кылууга эч кандай rate-limit жок — теориялык брутфорс тобокелдиги бар (1 сааттык мөөнөт менен азайтылган, бирок толук жок кылынган эмес).
+- `RESEND_API_KEY` Render'де `render.yaml`де `sync: false` менен белгиленген — dashboard'до **колдонуучунун өзү** кол менен коюшу керек (Resend'де катталуу, API key алуу). Коюлбаса, forgot-password иштейт, бирок email эч жерге жетпейт (тек server логдо көрүнөт) — production'до колдонулбашы керек, деплой алдында текшерүү милдеттүү.
+- Шифрлөө **веб платформада иштебейт** (`expo-secure-store`нин web колдоосу жок) — `Platform.OS === 'web'` учурда `secureStorage` unencrypted `AsyncStorage`ге кайтат. Мобилдик (Android/iOS) — толук шифрленет.
+- Шифрлөө "диск/backup'тан түз окулган дайынды" коргойт (мисалы, root'толгон түзмөктөн AsyncStorage файлын түз алуу). Түзмөк ачык турганда (unlocked) тиркеменин өзү иштеп жатканда чабуул кылса (мис. malware), коргоо жок — бул девайс-деңгээлдеги коопсуздук чара, тиркеме-деңгээлиндеги эмес.
+- Дарыгер лицензиясын текшерүү дагы эле ишке ашкан эмес (колдонуучу тарабынан бул тапшырмадан атайылап четке коюлду).
+
 ## Папка структурасы (иш жүзүндөгү)
 
 ```
@@ -99,20 +115,22 @@ health-app/
     i18n/            — ky.ts (канондук), ru.ts, en.ts
     navigation/       — RootNavigator.tsx
     notifications/    — reminderNotifications.ts, thresholdAlerts.ts
-    screens/          — Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth, Sleep
+    screens/          — Login, SignUp, ForgotPassword, ResetPassword, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth, Sleep
+    storage/          — secureStorage.ts (AsyncStorage'ди AES-шифрлөө менен ороп турган wrapper)
     theme/            — colors, typography, spacing, radii, ThemeProvider
   server/            — локалдуу Express auth+chat сервери (өз package.json'у, health-app'тин ичине кирбейт)
     Dockerfile        — cloud деплой үчүн (Render Docker environment), `npm install` + `tsx` менен иштетет
     render.yaml        — Render Blueprint (dashboard'до "New + Blueprint" ушуну автоматтык окуйт)
     src/
       index.ts        — listen(0.0.0.0:PORT)
-      app.ts           — Express app + auth routes (signup/login/me)
+      app.ts           — Express app + auth routes (signup/login/me/forgot-password/reset-password)
       authMiddleware.ts — requireAuth (app.ts менен chatRoutes.ts экөө тең колдонот)
       chatRoutes.ts     — /api/chat/* (requireDoctor гейт менен)
       dataRoutes.ts      — /api/data/{measurements,profile,reminders} (GET/PUT, requireAuth менен)
       auth.ts          — JWT sign/verify, production'до JWT_SECRET жоктон fail-fast
+      email.ts          — Resend аркылуу сырсөз калыбына келтирүү коду жиберет (RESEND_API_KEY жок болсо консолго логдойт)
       dataDir.ts        — JSON-файлдардын жайгашкан жерин аныктайт (`DATA_DIR` env же дефолт `data/`)
-      userStore.ts      — users.json'го окуу/жазуу (role талаасы менен)
+      userStore.ts      — users.json'го окуу/жазуу (role, resetCodeHash/resetCodeExpiresAt талаалары менен)
       chatStore.ts      — messages.json'го окуу/жазуу
       userDataStore.ts   — userData.json'го окуу/жазуу (userId боюнча measurements/profile/reminders blob)
 ```
@@ -166,7 +184,7 @@ CLAUDE.mdде баштапкы белгиленген бардык "кийинк
 
 1. ✅ **Backend cloud'го deploy кылуу — 2026-07-26да бүттү:** Render.com'дун акысыз tier'ине деплой болду (`https://healthtrack-api-shw7.onrender.com`), `EXPO_PUBLIC_API_URL` аркылуу мобилдик тиркеме ушул URL'ге туташат (толук деталь — жогорудагы "Cloud'го деплой кылуу (Render.com)" бөлүмүн кара). **Бирок бул толук чечим эмес** — Render'дин акысыз tier'инде persistent disk жок, JSON-файл сактоо ephemeral (ар бир redeploy/restart сайын бардык колдонуучулар/чат жоголот). Бул #2 пункттагы "дайын жоготуу тобокелдиги" менен кошулуп, чыныгы колдонуучулар келгенде чечилиши МИЛДЕТТҮҪ (persistent disk бар hosting'ке которуу же чыныгы DB'ге өтүү).
 2. ✅ **Дайын жоготуу тобокелдиги — 2026-07-26да негизи ишке ашырылды:** Measurements/Profile/Reminders эми Render'деги backend'ге дагы синхрондошот (толук деталь — жогорудагы "Cloud'го синхрондоштуруу" бөлүмүн кара). **Бирок толук чечим эмес** — (a) синхрондоштуруу "акыркы жазуу утат" модели, чыныгы conflict-resolution жок; (b) backend дайыны Render'дин ephemeral disk'инде — server redeploy/restart болсо, синхрондошкон дайын да жоголот (#1 пункттагы эскертүү менен түз байланышкан). Толук чечим үчүн persistent disk/чыныгы DB'ге которуу керек.
-3. **Коопсуздук:** AsyncStorage'дагы медициналык дайын шифрленбейт; `JWT_SECRET`дин dev-only дефолт мааниси бар (production'до дагы эле колдонулса — коркунучтуу); сырсөз калыбына келтирүү (forgot password) жок; "Мен дарыгермин" checkbox'ун эч ким текшербейт (бул production'до өзгөчө коркунучтуу — медициналык кеңеш берүү контекстинде).
+3. ✅ **Коопсуздук — 2026-07-27да жарым-жартылай ишке ашырылды:** AsyncStorage'дагы медициналык дайын (Measurements/Profile/Reminders/ReminderLog) эми `secureStorage` менен AES шифрленет (OS keychain/keystore'до сакталган ачкыч менен), жана чыныгы email-негизделген сырсөз калыбына келтирүү (Resend) кошулду — толук деталь жогорудагы "Шифрлөө жана сырсөз калыбына келтирүү" бөлүмүндө. **Колдонуучунун так суроосу боюнча четке коюлган:** "Мен дарыгермин" checkbox'ун лицензия менен текшерүү — бул өзүнчө чоң чечим бойдон калды. **Дагы деле чечилбеген:** `JWT_SECRET`дин dev-only дефолт мааниси (production fail-fast менен корголгон, бирок толук эмес); reset-код'до rate-limiting жок.
 4. **Ишенимдүүлүк:** Android'до (Xiaomi/Huawei ж.б. батарея-үнөмдөө агрессивдүү бренддерде) фондук эскертмелер/уйку-трекинг дагы эле тестирленген эмес (жогорудагы эскертүүлөрдү кара — "Уйку эсептегич", "Кадам эсептегич"). Автоматтык тесттер (unit/integration) такыр жок.
 5. **Улгайган колдонуучуга ылайыктоо:** Чоң тамга/жогорку контраст режими, биринчи ачылууда түшүндүрүү (onboarding) жок — CLAUDE.mdдеги максаттуу аудитория ("орто жаштагы жана улгайган колдонуучулар") менен интерфейстин татаалдыгы дал келбейт.
 6. **Play Store'го чыгарууга даярдык:** Купуялык саясаты (privacy policy), пайдалануу шарттары жок — "медициналык" категория Google тарабынан өзгөчө көзөмөлдөнөт, булар милдеттүү болот.

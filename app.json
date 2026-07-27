@@ -39,7 +39,8 @@
           "bluetoothAlwaysPermission": "Тонометр же пульсоксиметр сыяктуу Bluetooth түзмөктөрдү табуу жана туташуу үчүн"
         }
       ],
-      "expo-background-task"
+      "expo-background-task",
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {

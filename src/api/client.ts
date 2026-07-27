@@ -28,6 +28,7 @@ export type ApiErrorCode =
   | 'unauthorized'
   | 'forbidden'
   | 'invalid_input'
+  | 'invalid_reset_code'
   | 'network_error';
 
 export class ApiError extends Error {
@@ -74,6 +75,17 @@ export function login(email: string, password: string) {
 
 export function fetchMe(token: string) {
   return request<{ user: AuthUser }>('/api/auth/me', { token });
+}
+
+export function forgotPassword(email: string) {
+  return request<{ ok: boolean }>('/api/auth/forgot-password', { method: 'POST', body: { email } });
+}
+
+export function resetPassword(email: string, code: string, newPassword: string) {
+  return request<AuthResponse>('/api/auth/reset-password', {
+    method: 'POST',
+    body: { email, code, newPassword },
+  });
 }
 
 export type ChatMessage = {

@@ -12,6 +12,7 @@ type AuthContextValue = {
   signup: (email: string, password: string, role: UserRole) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  applySession: (token: string, user: AuthUser) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -58,7 +59,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }
 
-  const value = useMemo(() => ({ user, token, loading, signup, login, logout }), [user, token, loading]);
+  async function applySession(nextToken: string, nextUser: AuthUser) {
+    await persist(nextToken, nextUser);
+  }
+
+  const value = useMemo(
+    () => ({ user, token, loading, signup, login, logout, applySession }),
+    [user, token, loading]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

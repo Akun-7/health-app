@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, Pressable, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
@@ -73,6 +73,11 @@ export default function LoginScreen({ navigation }: Props) {
             {error ? (
               <Text style={{ ...typography.small, color: colors.danger }}>{error}</Text>
             ) : null}
+            <Pressable onPress={() => navigation.navigate('ForgotPassword')} hitSlop={8}>
+              <Text style={{ ...typography.small, color: colors.primary, textAlign: 'right' }}>
+                {t('login.forgotPassword')}
+              </Text>
+            </Pressable>
           </View>
 
           <View style={{ gap: spacing.md }}>

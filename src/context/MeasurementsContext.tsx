@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { secureStorage } from '../storage/secureStorage';
 import type { Measurement } from '../data/measurements';
 import { formatMeasurementValue } from '../data/measurements';
 import { classify } from '../data/insights';
@@ -35,7 +35,7 @@ export function MeasurementsProvider({ children }: { children: React.ReactNode }
   const syncedRef = useRef(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
+    secureStorage.getItem(STORAGE_KEY)
       .then((raw) => {
         if (raw) {
           hasLocalRef.current = true;
@@ -60,9 +60,9 @@ export function MeasurementsProvider({ children }: { children: React.ReactNode }
         .then(({ measurements: remote }) => {
           if (remote.length > 0) {
             setMeasurements(remote);
-            AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+            secureStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
           } else {
-            AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+            secureStorage.getItem(STORAGE_KEY).then((raw) => {
               if (raw) syncCloudMeasurements(token, JSON.parse(raw)).catch(() => {});
             });
           }
@@ -79,7 +79,7 @@ export function MeasurementsProvider({ children }: { children: React.ReactNode }
       .then(({ measurements: remote }) => {
         if (remote.length > 0) {
           setMeasurements(remote);
-          AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+          secureStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
         }
       })
       .catch(() => {})
@@ -88,7 +88,7 @@ export function MeasurementsProvider({ children }: { children: React.ReactNode }
 
   async function persist(next: Measurement[]) {
     setMeasurements(next);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    await secureStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     if (token) syncCloudMeasurements(token, next).catch(() => {});
   }
 

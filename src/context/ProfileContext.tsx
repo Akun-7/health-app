@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { secureStorage } from '../storage/secureStorage';
 import type { Profile } from '../data/profile';
 import { useAuth } from './AuthContext';
 import { fetchCloudProfile, syncCloudProfile } from '../api/client';
@@ -23,7 +23,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const syncedRef = useRef(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
+    secureStorage.getItem(STORAGE_KEY)
       .then((raw) => {
         if (raw) {
           hasLocalRef.current = true;
@@ -47,9 +47,9 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         .then(({ profile: remote }) => {
           if (remote) {
             setProfile(remote);
-            AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+            secureStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
           } else {
-            AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+            secureStorage.getItem(STORAGE_KEY).then((raw) => {
               if (raw) syncCloudProfile(token, JSON.parse(raw)).catch(() => {});
             });
           }
@@ -66,7 +66,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       .then(({ profile: remote }) => {
         if (remote) {
           setProfile(remote);
-          AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+          secureStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
         }
       })
       .catch(() => {})
@@ -75,7 +75,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
   async function saveProfile(next: Profile) {
     setProfile(next);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    await secureStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     if (token) syncCloudProfile(token, next).catch(() => {});
   }
 

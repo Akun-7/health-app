@@ -14,6 +14,7 @@ export const en: Record<TranslationKey, string> = {
   'login.errorRequired': 'Enter your email and password',
   'login.submit': 'Sign in',
   'login.createAccount': 'Create account',
+  'login.forgotPassword': 'Forgot password?',
 
   'signup.title': 'Create account',
   'signup.subtitle': 'Sign up to track your health',
@@ -27,6 +28,24 @@ export const en: Record<TranslationKey, string> = {
   'auth.emailTaken': 'An account with this email already exists',
   'auth.invalidCredentials': 'Incorrect email or password',
   'auth.networkError': "Couldn't reach the server. Check that it's running.",
+
+  'forgotPassword.title': 'Reset your password',
+  'forgotPassword.subtitle': "Enter the email you signed up with — we'll send you a reset code",
+  'forgotPassword.submit': 'Send code',
+  'forgotPassword.sent': 'If an account exists for this email, a password reset code has been sent (valid for 1 hour).',
+  'forgotPassword.enterCode': 'Enter code',
+  'forgotPassword.backToLogin': 'Back to sign in',
+
+  'resetPassword.title': 'Set a new password',
+  'resetPassword.subtitle': 'Enter the code from your email and a new password',
+  'resetPassword.emailLabel': 'Email',
+  'resetPassword.codeLabel': 'Code',
+  'resetPassword.codePlaceholder': 'XXXXXXXX',
+  'resetPassword.newPasswordLabel': 'New password',
+  'resetPassword.confirmPasswordLabel': 'Confirm new password',
+  'resetPassword.submit': 'Update password',
+  'resetPassword.errorMismatch': "Passwords don't match",
+  'resetPassword.invalidCode': 'The code is invalid or has expired',
 
   'profileSetup.titleCreate': 'Set up your profile',
   'profileSetup.titleEdit': 'Edit profile',

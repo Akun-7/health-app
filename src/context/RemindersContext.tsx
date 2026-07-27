@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { secureStorage } from '../storage/secureStorage';
 import type { Reminder, ReminderCategory } from '../data/reminders';
 import {
   configureNotificationHandler,
@@ -49,7 +49,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
 
   async function persist(next: Reminder[]) {
     setReminders(next);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    await secureStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     if (token) syncCloudReminders(token, next).catch(() => {});
   }
 
@@ -69,7 +69,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     configureNotificationHandler();
     configureAdherenceCategory(t('reminder.taken'), t('reminder.skip'));
-    AsyncStorage.getItem(STORAGE_KEY)
+    secureStorage.getItem(STORAGE_KEY)
       .then((raw) => {
         if (raw) {
           hasLocalRef.current = true;
@@ -96,7 +96,7 @@ export function RemindersProvider({ children }: { children: React.ReactNode }) {
       // cancelled, silently duplicating alerts over time.
       setLoading(false);
       if (!token) return;
-      AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+      secureStorage.getItem(STORAGE_KEY).then((raw) => {
         if (raw) syncCloudReminders(token, JSON.parse(raw)).catch(() => {});
       });
       return;

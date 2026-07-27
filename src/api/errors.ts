@@ -9,5 +9,6 @@ export const apiErrorKey: Record<ApiErrorCode, TranslationKey> = {
   unauthorized: 'auth.invalidCredentials',
   forbidden: 'auth.invalidCredentials',
   invalid_input: 'chat.errorEmpty',
+  invalid_reset_code: 'resetPassword.invalidCode',
   network_error: 'auth.networkError',
 };

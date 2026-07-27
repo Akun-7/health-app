@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 import ProfileSetupScreen from '../screens/ProfileSetupScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import AddMeasurementScreen from '../screens/AddMeasurementScreen';
@@ -25,6 +27,8 @@ import SleepScreen from '../screens/SleepScreen';
 export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
+  ForgotPassword: undefined;
+  ResetPassword: { email?: string } | undefined;
   ProfileSetup: { mode?: 'edit' } | undefined;
   Dashboard: undefined;
   AddMeasurement: undefined;
@@ -83,6 +87,8 @@ export default function RootNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRouteName}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
         <Stack.Screen name="AddMeasurement" component={AddMeasurementScreen} />

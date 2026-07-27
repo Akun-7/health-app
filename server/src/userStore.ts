@@ -10,6 +10,8 @@ export type User = {
   passwordHash: string;
   role: UserRole;
   createdAt: number;
+  resetCodeHash: string | null;
+  resetCodeExpiresAt: number | null;
 };
 
 const DB_PATH = dataFilePath('users.json');
@@ -40,8 +42,29 @@ export function createUser(email: string, passwordHash: string, role: UserRole):
     passwordHash,
     role,
     createdAt: Date.now(),
+    resetCodeHash: null,
+    resetCodeExpiresAt: null,
   };
   users.push(user);
   save(users);
   return user;
+}
+
+export function setResetCode(userId: string, resetCodeHash: string, resetCodeExpiresAt: number) {
+  const users = load();
+  const user = users.find((u) => u.id === userId);
+  if (!user) return;
+  user.resetCodeHash = resetCodeHash;
+  user.resetCodeExpiresAt = resetCodeExpiresAt;
+  save(users);
+}
+
+export function updatePassword(userId: string, passwordHash: string) {
+  const users = load();
+  const user = users.find((u) => u.id === userId);
+  if (!user) return;
+  user.passwordHash = passwordHash;
+  user.resetCodeHash = null;
+  user.resetCodeExpiresAt = null;
+  save(users);
 }

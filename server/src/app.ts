@@ -1,16 +1,34 @@
+import crypto from 'crypto';
 import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
-import { createUser, findByEmail, findById } from './userStore';
+import { createUser, findByEmail, findById, setResetCode, updatePassword } from './userStore';
 import type { UserRole } from './userStore';
 import { signToken } from './auth';
 import { requireAuth } from './authMiddleware';
 import type { AuthedRequest } from './authMiddleware';
 import { createChatRouter } from './chatRoutes';
 import { createDataRouter } from './dataRoutes';
+import { sendPasswordResetEmail } from './email';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 6;
+const RESET_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I/L
+const RESET_CODE_LENGTH = 8;
+const RESET_CODE_TTL_MS = 60 * 60 * 1000;
+
+function generateResetCode(): string {
+  const bytes = crypto.randomBytes(RESET_CODE_LENGTH);
+  let code = '';
+  for (let i = 0; i < RESET_CODE_LENGTH; i++) {
+    code += RESET_CODE_ALPHABET[bytes[i] % RESET_CODE_ALPHABET.length];
+  }
+  return code;
+}
+
+function hashResetCode(code: string): string {
+  return crypto.createHash('sha256').update(code).digest('hex');
+}
 
 export function toPublicUser(user: { id: string; email: string; role: UserRole }) {
   return { id: user.id, email: user.email, role: user.role };
@@ -60,6 +78,47 @@ export function createApp() {
       return;
     }
     res.json({ user: toPublicUser(user) });
+  });
+
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    const { email } = req.body ?? {};
+    const user = typeof email === 'string' ? findByEmail(email) : undefined;
+    // Always respond the same way regardless of whether the account exists,
+    // so this endpoint can't be used to enumerate registered emails.
+    if (user) {
+      const code = generateResetCode();
+      setResetCode(user.id, hashResetCode(code), Date.now() + RESET_CODE_TTL_MS);
+      try {
+        await sendPasswordResetEmail(user.email, code);
+      } catch {
+        // Swallow — we still respond ok so the response shape can't reveal
+        // whether the account exists or whether delivery succeeded.
+      }
+    }
+    res.json({ ok: true });
+  });
+
+  app.post('/api/auth/reset-password', async (req, res) => {
+    const { email, code, newPassword } = req.body ?? {};
+    if (typeof newPassword !== 'string' || newPassword.length < MIN_PASSWORD_LENGTH) {
+      res.status(400).json({ error: 'invalid_password' });
+      return;
+    }
+    const user = typeof email === 'string' ? findByEmail(email) : undefined;
+    const validCode =
+      user &&
+      typeof code === 'string' &&
+      user.resetCodeHash &&
+      user.resetCodeExpiresAt &&
+      user.resetCodeExpiresAt > Date.now() &&
+      user.resetCodeHash === hashResetCode(code.trim().toUpperCase());
+    if (!user || !validCode) {
+      res.status(400).json({ error: 'invalid_reset_code' });
+      return;
+    }
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    updatePassword(user.id, passwordHash);
+    res.json({ token: signToken(user.id), user: toPublicUser(user) });
   });
 
   app.use('/api/chat', createChatRouter());

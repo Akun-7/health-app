@@ -13,6 +13,7 @@ export const ky = {
   'login.errorRequired': 'Email жана сырсөздү толтуруңуз',
   'login.submit': 'Кирүү',
   'login.createAccount': 'Аккаунт түзүү',
+  'login.forgotPassword': 'Сырсөздү унуттуңузбу?',
 
   'signup.title': 'Аккаунт түзүү',
   'signup.subtitle': 'Ден соолугуңузду көзөмөлдөө үчүн катталыңыз',
@@ -26,6 +27,24 @@ export const ky = {
   'auth.emailTaken': 'Бул email менен аккаунт мурунтан бар',
   'auth.invalidCredentials': 'Email же сырсөз туура эмес',
   'auth.networkError': 'Серверге туташуу мүмкүн болбоду. Сервер иштеп жатабы текшериңиз.',
+
+  'forgotPassword.title': 'Сырсөздү калыбына келтирүү',
+  'forgotPassword.subtitle': 'Каттоодо колдонгон email дарегиңизди киргизиңиз — сизге калыбына келтирүү коду жөнөтөбүз',
+  'forgotPassword.submit': 'Код жөнөтүү',
+  'forgotPassword.sent': 'Эгер бул email менен аккаунт катталган болсо, ага сырсөздү калыбына келтирүү коду жөнөтүлдү (1 саат жарактуу).',
+  'forgotPassword.enterCode': 'Кодду киргизүү',
+  'forgotPassword.backToLogin': 'Кирүүгө кайтуу',
+
+  'resetPassword.title': 'Жаны сырсөз коюу',
+  'resetPassword.subtitle': 'Почтаңызга келген кодду жана жаны сырсөзүңүздү киргизиңиз',
+  'resetPassword.emailLabel': 'Email',
+  'resetPassword.codeLabel': 'Код',
+  'resetPassword.codePlaceholder': 'XXXXXXXX',
+  'resetPassword.newPasswordLabel': 'Жаны сырсөз',
+  'resetPassword.confirmPasswordLabel': 'Жаны сырсөздү кайталаңыз',
+  'resetPassword.submit': 'Сырсөздү жаңыртуу',
+  'resetPassword.errorMismatch': 'Сырсөздөр дал келбейт',
+  'resetPassword.invalidCode': 'Код туура эмес же мөөнөтү өткөн',
 
   'profileSetup.titleCreate': 'Профилиңизди түзүңүз',
   'profileSetup.titleEdit': 'Профилди түзөтүү',
