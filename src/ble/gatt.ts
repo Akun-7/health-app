@@ -26,7 +26,7 @@ export function base64ToBytes(base64: string): Uint8Array {
 }
 
 // IEEE-11073 16-bit SFLOAT: 4-bit signed exponent + 12-bit signed mantissa.
-function parseSFloat(bytes: Uint8Array, offset: number): number | null {
+export function parseSFloat(bytes: Uint8Array, offset: number): number | null {
   const raw = bytes[offset] | (bytes[offset + 1] << 8);
   const mantissaRaw = raw & 0x0fff;
   const exponent = (raw >> 12) & 0xf;

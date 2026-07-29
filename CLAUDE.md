@@ -98,6 +98,24 @@ Backend жагындагы дайын ошол эле "Cloud'го деплой �
 - Шифрлөө "диск/backup'тан түз окулган дайынды" коргойт (мисалы, root'толгон түзмөктөн AsyncStorage файлын түз алуу). Түзмөк ачык турганда (unlocked) тиркеменин өзү иштеп жатканда чабуул кылса (мис. malware), коргоо жок — бул девайс-деңгээлдеги коопсуздук чара, тиркеме-деңгээлиндеги эмес.
 - Дарыгер лицензиясын текшерүү дагы эле ишке ашкан эмес (колдонуучу тарабынан бул тапшырмадан атайылап четке коюлду).
 
+## Автоматтык тесттер (Jest, "Production readiness" #4дүн биринчи бөлүгү)
+
+2026-07-29да ишке ашырылды. **Колдонуучунун так суроосу боюнча чөйрө так белгиленген:** тек таза-логика функциялары (input→output, эч кандай React/RN/network/AsyncStorage көз карандылыгы жок) — UI компоненттерине/context'терге/screen'дерге такыр тийилген эмес. Эки өз-өзүнчө Jest орнотуусу бар (`health-app/` жана `server/` — экөө тең өз алдынча npm проектери болгондуктан):
+
+- **`health-app/jest.config.js`** — `ts-jest`, `testEnvironment: 'node'`, `src/**/*.test.ts` гана. `npm test` менен иштетилет.
+- **`server/jest.config.js`** — ошол эле схема, `server/src/**/*.test.ts`.
+
+**Тестелген функциялар жана тест саны (баары өтөт — `41 + 5 = 46` тест, 5 файл):**
+- `src/data/insights.ts` → `classify()` — 11 тест: кан басым/пульс/SpO2 үчүн `good`/`watch`/`concern` чектери, анын ичинде так чек маанилери (мис. 90/60, 140/90).
+- `src/data/sleep.ts` → `inferSessions()` жана `formatDurationParts()` — 9 тест: 3 сааттык минимум, 45 мүнөттүк gap-толеранттуулук (так чегинде бирикет, andan ашса бөлүнөт), "still эмес" сэмпл сессияны бүтүрөт, көп сессия акыркысынан баштап сорттолот, сэмплдер irети менен эмес берилсе да иштейт.
+- `src/data/reminderLog.ts` → `weeklyStats()` — 5 тест: `reminderId` боюнча чыпкалоо, 7 күндүк cutoff, `taken`/`total` эсептөө.
+- `src/ble/gatt.ts` → `parseSFloat()` (тестирлөө үчүн `export` кылынды, мурун private болчу), `parseBloodPressureMeasurement()`, `parsePulseOximeterMeasurement()` — 16 тест: IEEE-11073 SFLOAT'тун оң/терс мантисса, оң/терс экспонента, NaN sentinel (0x07FF) учурлары; байт-деңгээлдеги пакеттер (флагдар, milдеттүү эмес timestamp которуштуруу, кыска буфер, милдеттүү эмес талаалардын жоктугу) кол менен курулган base64 пакеттер менен текшерилди.
+- `server/src/auth.ts` → `signToken()`/`verifyToken()` — 5 тест: round-trip, ар башка `userId`лердин алдырылбашы, жалган/бузук токен четке кагылышы, башка сыр сөз менен колтамгаланган токен четке кагылышы, мөөнөтү өткөн токен четке кагылышы.
+
+⚠️ **Орнотуу учурунда кездешкен готча (кайра жолукса эске):** `jest@30` менен `react-native@0.81`нин транзитивдик көз карандылыгы (`jest-environment-node@29.7.0`) ортосунда версия конфликти чыккан (`TypeError: this._moduleMocker.clearMocksOnScope is not a function`). Чечими — `health-app/package.json`гa `"overrides": {"jest-environment-node": "30.4.1"}` кошуу (npm overrides, бир версияны бүт дарактын боюна мажбурлайт).
+
+**Дагы эле жок:** component/screen/context тесттери (React Native Testing Library сыяктуу), integration тесттер (мисалы, чыныгы HTTP сурам менен `server/`ди сыноо), E2E тесттер (Detox/Maestro). Бул тапшырма ачык эле "эң критикалуу таза-логика функциялары" менен чектелди — калгандары өзүнчө тапшырма катары каралышы керек.
+
 ## Папка структурасы (иш жүзүндөгү)
 
 ```
@@ -105,13 +123,14 @@ health-app/
   App.tsx
   index.ts
   app.json
+  jest.config.js    — ts-jest, src/**/*.test.ts гана (component/screen тесттери жок)
   src/
     api/             — client.ts (fetch wrapper + LAN base URL), errors.ts (ApiErrorCode → TranslationKey)
-    ble/             — gatt.ts (стандарттуу BLE UUID'лар + IEEE-11073 SFLOAT парсинг, native модулго көз каранды эмес)
+    ble/             — gatt.ts (стандарттуу BLE UUID'лар + IEEE-11073 SFLOAT парсинг, native модулго көз каранды эмес; gatt.test.ts бар)
     sleep/           — sleepSampling.ts (background task definition + акселерометр өлчөө)
     components/     — Button, TextField, VitalCard, MeasurementIcon, ReminderIcon, ReminderListItem, ThemeModeSelector, LanguageSelector, MedicalDisclaimer, SettingsLinkRow, ClearDataSection
     context/         — MeasurementsContext, ProfileContext, RemindersContext, ReminderLogContext, SettingsContext, LocaleContext, AuthContext, EmergencyContactsContext, BleContext, StepsContext, SleepContext, ComposeProviders
-    data/            — measurements.ts, profile.ts, reminders.ts, reminderLog.ts, insights.ts, emergencyContacts.ts, sos.ts, steps.ts, sleep.ts (типтер + форматтоо/эсептөө функциялары; көрсөтүлүүчү тексттер эмес — алар i18n'де)
+    data/            — measurements.ts, profile.ts, reminders.ts, reminderLog.ts, insights.ts, emergencyContacts.ts, sos.ts, steps.ts, sleep.ts (типтер + форматтоо/эсептөө функциялары; көрсөтүлүүчү тексттер эмес — алар i18n'де; insights/sleep/reminderLog'дун `*.test.ts` файлдары бар)
     i18n/            — ky.ts (канондук), ru.ts, en.ts
     navigation/       — RootNavigator.tsx
     notifications/    — reminderNotifications.ts, thresholdAlerts.ts
@@ -121,13 +140,14 @@ health-app/
   server/            — локалдуу Express auth+chat сервери (өз package.json'у, health-app'тин ичине кирбейт)
     Dockerfile        — cloud деплой үчүн (Render Docker environment), `npm install` + `tsx` менен иштетет
     render.yaml        — Render Blueprint (dashboard'до "New + Blueprint" ушуну автоматтык окуйт)
+    jest.config.js     — ts-jest, server/src/**/*.test.ts гана
     src/
       index.ts        — listen(0.0.0.0:PORT)
       app.ts           — Express app + auth routes (signup/login/me/forgot-password/reset-password)
       authMiddleware.ts — requireAuth (app.ts менен chatRoutes.ts экөө тең колдонот)
       chatRoutes.ts     — /api/chat/* (requireDoctor гейт менен)
       dataRoutes.ts      — /api/data/{measurements,profile,reminders} (GET/PUT, requireAuth менен)
-      auth.ts          — JWT sign/verify, production'до JWT_SECRET жоктон fail-fast
+      auth.ts          — JWT sign/verify, production'до JWT_SECRET жоктон fail-fast; auth.test.ts бар
       email.ts          — Resend аркылуу сырсөз калыбына келтирүү коду жиберет (RESEND_API_KEY жок болсо консолго логдойт)
       dataDir.ts        — JSON-файлдардын жайгашкан жерин аныктайт (`DATA_DIR` env же дефолт `data/`)
       userStore.ts      — users.json'го окуу/жазуу (role, resetCodeHash/resetCodeExpiresAt талаалары менен)
@@ -184,8 +204,8 @@ CLAUDE.mdде баштапкы белгиленген бардык "кийинк
 
 1. ✅ **Backend cloud'го deploy кылуу — 2026-07-26да бүттү:** Render.com'дун акысыз tier'ине деплой болду (`https://healthtrack-api-shw7.onrender.com`), `EXPO_PUBLIC_API_URL` аркылуу мобилдик тиркеме ушул URL'ге туташат (толук деталь — жогорудагы "Cloud'го деплой кылуу (Render.com)" бөлүмүн кара). **Бирок бул толук чечим эмес** — Render'дин акысыз tier'инде persistent disk жок, JSON-файл сактоо ephemeral (ар бир redeploy/restart сайын бардык колдонуучулар/чат жоголот). Бул #2 пункттагы "дайын жоготуу тобокелдиги" менен кошулуп, чыныгы колдонуучулар келгенде чечилиши МИЛДЕТТҮҪ (persistent disk бар hosting'ке которуу же чыныгы DB'ге өтүү).
 2. ✅ **Дайын жоготуу тобокелдиги — 2026-07-26да негизи ишке ашырылды:** Measurements/Profile/Reminders эми Render'деги backend'ге дагы синхрондошот (толук деталь — жогорудагы "Cloud'го синхрондоштуруу" бөлүмүн кара). **Бирок толук чечим эмес** — (a) синхрондоштуруу "акыркы жазуу утат" модели, чыныгы conflict-resolution жок; (b) backend дайыны Render'дин ephemeral disk'инде — server redeploy/restart болсо, синхрондошкон дайын да жоголот (#1 пункттагы эскертүү менен түз байланышкан). Толук чечим үчүн persistent disk/чыныгы DB'ге которуу керек.
-3. ✅ **Коопсуздук — 2026-07-27да жарым-жартылай ишке ашырылды:** AsyncStorage'дагы медициналык дайын (Measurements/Profile/Reminders/ReminderLog) эми `secureStorage` менен AES шифрленет (OS keychain/keystore'до сакталган ачкыч менен), жана чыныгы email-негизделген сырсөз калыбына келтирүү (Resend) кошулду — толук деталь жогорудагы "Шифрлөө жана сырсөз калыбына келтирүү" бөлүмүндө. **Колдонуучунун так суроосу боюнча четке коюлган:** "Мен дарыгермин" checkbox'ун лицензия менен текшерүү — бул өзүнчө чоң чечим бойдон калды. **Дагы деле чечилбеген:** `JWT_SECRET`дин dev-only дефолт мааниси (production fail-fast менен корголгон, бирок толук эмес); reset-код'до rate-limiting жок.
-4. **Ишенимдүүлүк:** Android'до (Xiaomi/Huawei ж.б. батарея-үнөмдөө агрессивдүү бренддерде) фондук эскертмелер/уйку-трекинг дагы эле тестирленген эмес (жогорудагы эскертүүлөрдү кара — "Уйку эсептегич", "Кадам эсептегич"). Автоматтык тесттер (unit/integration) такыр жок.
+3. ✅ **Коопсуздук — 2026-07-27да ишке ашырылды, 2026-07-28де чыныгы телефондо колдонуучу тарабынан ырасталды:** AsyncStorage'дагы медициналык дайын (Measurements/Profile/Reminders/ReminderLog) эми `secureStorage` менен AES шифрленет (OS keychain/keystore'до сакталган ачкыч менен), жана чыныгы email-негизделген сырсөз калыбына келтирүү (Resend) кошулду — толук деталь жогорудагы "Шифрлөө жана сырсөз калыбына келтирүү" бөлүмүндө. Эки функция тең EAS dev-client build'да чыныгы Android телефондо сыналып, иштээри ырасталды (tunnel режими аркылуу туташуу — LAN режими роутердин белгисиз себеп менен блоктошунан улам иштебей калган). **Колдонуучунун так суроосу боюнча четке коюлган:** "Мен дарыгермин" checkbox'ун лицензия менен текшерүү — бул өзүнчө чоң чечим бойдон калды. **Дагы деле чечилбеген:** `JWT_SECRET`дин dev-only дефолт мааниси (production fail-fast менен корголгон, бирок толук эмес); reset-код'до rate-limiting жок.
+4. 🔶 **Ишенимдүүлүк — 2026-07-29да жарым-жартылай башталды:** Эң критикалуу таза-логика функцияларына (`classify`, `inferSessions`, `weeklyStats`, BLE SFLOAT/пакет парсинг, JWT sign/verify) Jest unit-тесттери жазылды — 46 тест, 5 файл, баары өтөт (толук деталь жогорудагы "Автоматтык тесттер (Jest)" бөлүмүндө). **Дагы эле жок:** component/screen/context тесттери, integration/E2E тесттер. Android'до (Xiaomi/Huawei ж.б. батарея-үнөмдөө агрессивдүү бренддерде) фондук эскертмелер/уйку-трекинг дагы эле чыныгы шарттарда тестирленген эмес (жогорудагы эскертүүлөрдү кара — "Уйку эсептегич", "Кадам эсептегич").
 5. **Улгайган колдонуучуга ылайыктоо:** Чоң тамга/жогорку контраст режими, биринчи ачылууда түшүндүрүү (onboarding) жок — CLAUDE.mdдеги максаттуу аудитория ("орто жаштагы жана улгайган колдонуучулар") менен интерфейстин татаалдыгы дал келбейт.
 6. **Play Store'го чыгарууга даярдык:** Купуялык саясаты (privacy policy), пайдалануу шарттары жок — "медициналык" категория Google тарабынан өзгөчө көзөмөлдөнөт, булар милдеттүү болот.
 
