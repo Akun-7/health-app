@@ -30,8 +30,10 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# local/secret env files (the already-tracked root .env — public API URL
+# only, no secrets — stays tracked; this just stops any new .env variant,
+# e.g. .env.local or .env.production, from being committed by accident)
+.env*
 
 # typescript
 *.tsbuildinfo
