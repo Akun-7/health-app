@@ -62,11 +62,15 @@ async function request<T>(path: string, options?: { method?: string; body?: unkn
 }
 
 export type UserRole = 'patient' | 'doctor';
-export type AuthUser = { id: string; email: string; role: UserRole };
+export type VerificationStatus = 'pending' | 'approved' | 'rejected';
+export type AuthUser = { id: string; email: string; role: UserRole; verificationStatus: VerificationStatus | null };
 export type AuthResponse = { token: string; user: AuthUser };
 
-export function signup(email: string, password: string, role: UserRole) {
-  return request<AuthResponse>('/api/auth/signup', { method: 'POST', body: { email, password, role } });
+export function signup(email: string, password: string, role: UserRole, licenseDocumentBase64?: string) {
+  return request<AuthResponse>('/api/auth/signup', {
+    method: 'POST',
+    body: { email, password, role, licenseDocumentBase64 },
+  });
 }
 
 export function login(email: string, password: string) {

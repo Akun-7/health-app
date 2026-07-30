@@ -40,7 +40,13 @@
         }
       ],
       "expo-background-task",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Дарыгердин лицензия/диплом сүрөтүн тандоо үчүн галереяга мүмкүнчүлүк керек"
+        }
+      ]
     ],
     "extra": {
       "eas": {

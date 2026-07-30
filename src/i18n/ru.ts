@@ -20,8 +20,12 @@ export const ru: Record<TranslationKey, string> = {
   'signup.subtitle': 'Зарегистрируйтесь, чтобы следить за здоровьем',
   'signup.submit': 'Зарегистрироваться',
   'signup.haveAccount': 'У меня есть аккаунт',
-  'signup.doctorToggle': 'Я врач (не проверено, только MVP)',
-  'signup.doctorDisclaimer': 'В этом MVP регистрация врача никак не проверяется (нет диплома/лицензии). Эта опция только для локального тестирования обеих сторон чата.',
+  'signup.doctorToggle': 'Я врач (проверяется по фото лицензии/диплома)',
+  'signup.doctorDisclaimer': 'Для регистрации как врач нужно загрузить фото лицензии или диплома. Аккаунт будет в статусе "на проверке", пока администратор приложения не проверит его вручную. Это не полноценная система верификации — простая проверка, доступная только одному администратору.',
+  'signup.licenseImagePick': 'Выбрать фото лицензии/диплома',
+  'signup.licenseImageChange': 'Заменить фото',
+  'signup.licenseImageRequired': 'Для регистрации как врач нужно загрузить фото лицензии/диплома',
+  'signup.licenseImagePermissionDenied': 'Нужен доступ к галерее для выбора фото',
 
   'auth.invalidEmail': 'Некорректный email',
   'auth.invalidPassword': 'Пароль должен быть не короче 6 символов',
@@ -101,6 +105,8 @@ export const ru: Record<TranslationKey, string> = {
 
   'doctorInbox.title': 'Пациенты',
   'doctorInbox.empty': 'Пока никто не написал.',
+  'doctorInbox.pending': 'Ваша регистрация проверяется администратором. После проверки вы сможете видеть сообщения пациентов.',
+  'doctorInbox.rejected': 'Ваша регистрация отклонена. За подробностями обратитесь к администратору приложения.',
 
   'bluetooth.title': 'Bluetooth',
   'bluetooth.subtitle': 'Найдите тонометр или пульсоксиметр для подключения',

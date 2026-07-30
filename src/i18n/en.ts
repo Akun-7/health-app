@@ -20,8 +20,12 @@ export const en: Record<TranslationKey, string> = {
   'signup.subtitle': 'Sign up to track your health',
   'signup.submit': 'Sign up',
   'signup.haveAccount': 'I already have an account',
-  'signup.doctorToggle': "I'm a doctor (unverified, MVP only)",
-  'signup.doctorDisclaimer': "In this MVP, doctor registration isn't verified against any license or diploma. This option exists only for locally testing both sides of the chat.",
+  'signup.doctorToggle': "I'm a doctor (verified via license/diploma photo)",
+  'signup.doctorDisclaimer': "Registering as a doctor requires uploading a photo of your license or diploma. Your account stays \"pending\" until the app's administrator reviews it manually. This isn't a full verification system — just a simple check available to a single administrator.",
+  'signup.licenseImagePick': 'Choose license/diploma photo',
+  'signup.licenseImageChange': 'Change photo',
+  'signup.licenseImageRequired': 'Registering as a doctor requires uploading a photo of your license/diploma',
+  'signup.licenseImagePermissionDenied': 'Gallery access is required to choose a photo',
 
   'auth.invalidEmail': 'Invalid email address',
   'auth.invalidPassword': 'Password must be at least 6 characters',
@@ -101,6 +105,8 @@ export const en: Record<TranslationKey, string> = {
 
   'doctorInbox.title': 'Patients',
   'doctorInbox.empty': "No one has written yet.",
+  'doctorInbox.pending': "Your registration is being reviewed by an administrator. You'll be able to see patient messages once it's approved.",
+  'doctorInbox.rejected': 'Your registration was rejected. Contact the app administrator for details.',
 
   'bluetooth.title': 'Bluetooth',
   'bluetooth.subtitle': 'Scan to find your blood pressure monitor or pulse oximeter',

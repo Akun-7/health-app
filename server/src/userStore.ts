@@ -3,6 +3,7 @@ import path from 'path';
 import { dataFilePath } from './dataDir';
 
 export type UserRole = 'patient' | 'doctor';
+export type VerificationStatus = 'pending' | 'approved' | 'rejected';
 
 export type User = {
   id: string;
@@ -12,6 +13,9 @@ export type User = {
   createdAt: number;
   resetCodeHash: string | null;
   resetCodeExpiresAt: number | null;
+  // Only meaningful when role === 'doctor'. Patients leave both null.
+  verificationStatus: VerificationStatus | null;
+  licenseDocumentBase64: string | null;
 };
 
 const DB_PATH = dataFilePath('users.json');
@@ -34,7 +38,12 @@ export function findById(id: string): User | undefined {
   return load().find((u) => u.id === id);
 }
 
-export function createUser(email: string, passwordHash: string, role: UserRole): User {
+export function createUser(
+  email: string,
+  passwordHash: string,
+  role: UserRole,
+  licenseDocumentBase64: string | null
+): User {
   const users = load();
   const user: User = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
@@ -44,8 +53,23 @@ export function createUser(email: string, passwordHash: string, role: UserRole):
     createdAt: Date.now(),
     resetCodeHash: null,
     resetCodeExpiresAt: null,
+    verificationStatus: role === 'doctor' ? 'pending' : null,
+    licenseDocumentBase64: role === 'doctor' ? licenseDocumentBase64 : null,
   };
   users.push(user);
+  save(users);
+  return user;
+}
+
+export function listPendingDoctors(): User[] {
+  return load().filter((u) => u.role === 'doctor' && u.verificationStatus === 'pending');
+}
+
+export function setVerificationStatus(userId: string, status: VerificationStatus): User | undefined {
+  const users = load();
+  const user = users.find((u) => u.id === userId && u.role === 'doctor');
+  if (!user) return undefined;
+  user.verificationStatus = status;
   save(users);
   return user;
 }

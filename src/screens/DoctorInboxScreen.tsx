@@ -14,12 +14,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'DoctorInbox'>;
 
 export default function DoctorInboxScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
-  const { token, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const { t } = useLocale();
   const [threads, setThreads] = useState<ChatThread[]>([]);
+  const isVerified = user?.verificationStatus === 'approved';
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !isVerified) return;
     let cancelled = false;
     fetchThreads(token).then((result) => {
       if (!cancelled) setThreads(result.threads);
@@ -27,11 +28,34 @@ export default function DoctorInboxScreen({ navigation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, isVerified]);
 
   async function handleLogout() {
     await logout();
     navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+  }
+
+  if (!isVerified) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.pageBackground, padding: spacing.lg, gap: spacing.xl, justifyContent: 'center' }}>
+        <Text style={{ ...typography.h2, color: colors.textPrimary, textAlign: 'center' }}>
+          {user?.verificationStatus === 'rejected' ? t('doctorInbox.rejected') : t('doctorInbox.pending')}
+        </Text>
+        <Pressable
+          onPress={handleLogout}
+          style={{
+            height: sizes.buttonHeight,
+            borderRadius: radii.button,
+            borderWidth: 1,
+            borderColor: colors.border,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ ...typography.body, color: colors.textPrimary }}>{t('settings.logout')}</Text>
+        </Pressable>
+      </View>
+    );
   }
 
   return (
