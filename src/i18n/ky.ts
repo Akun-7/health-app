@@ -200,6 +200,9 @@ export const ky = {
   'settings.clearConfirm': 'Бардык өлчөөлөр жана эскертмелер өчүрүлөт. Ырастайсызбы?',
   'settings.clearConfirmYes': 'Ооба, тазалоо',
   'settings.clearAll': 'Бардык дайындарды тазалоо',
+  'settings.legalSection': 'Юридикалык маалымат',
+  'settings.privacyPolicy': 'Купуялык саясаты',
+  'settings.termsOfService': 'Пайдалануу шарттары',
   'settings.logout': 'Чыгуу',
 
   'theme.system': 'Тутум',

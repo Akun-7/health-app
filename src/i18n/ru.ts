@@ -201,6 +201,9 @@ export const ru: Record<TranslationKey, string> = {
   'settings.clearConfirm': 'Все измерения и напоминания будут удалены. Подтверждаете?',
   'settings.clearConfirmYes': 'Да, очистить',
   'settings.clearAll': 'Очистить все данные',
+  'settings.legalSection': 'Юридическая информация',
+  'settings.privacyPolicy': 'Политика конфиденциальности',
+  'settings.termsOfService': 'Условия использования',
   'settings.logout': 'Выйти',
 
   'theme.system': 'Системная',

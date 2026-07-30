@@ -201,6 +201,9 @@ export const en: Record<TranslationKey, string> = {
   'settings.clearConfirm': 'All measurements and reminders will be deleted. Are you sure?',
   'settings.clearConfirmYes': 'Yes, clear',
   'settings.clearAll': 'Clear all data',
+  'settings.legalSection': 'Legal',
+  'settings.privacyPolicy': 'Privacy Policy',
+  'settings.termsOfService': 'Terms of Service',
   'settings.logout': 'Log out',
 
   'theme.system': 'System',

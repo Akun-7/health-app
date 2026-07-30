@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, Linking } from 'react-native';
 import {
   IconArrowLeft,
   IconLogout,
@@ -6,6 +6,8 @@ import {
   IconPencil,
   IconAlertTriangle,
   IconMoon,
+  IconShieldLock,
+  IconFileText,
 } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import ThemeModeSelector from '../components/ThemeModeSelector';
@@ -24,6 +26,11 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
+
+// Only a Kyrgyz version exists so far — all three UI locales (ky/ru/en) point
+// here for now until ru/en translations of the legal pages are published.
+const PRIVACY_POLICY_URL = 'https://akun-7.github.io/health-app/privacy-policy.html';
+const TERMS_OF_SERVICE_URL = 'https://akun-7.github.io/health-app/terms-of-service.html';
 
 export default function SettingsScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
@@ -144,6 +151,20 @@ export default function SettingsScreen({ navigation }: Props) {
       <View style={{ gap: spacing.sm }}>
         <Text style={{ ...typography.caption, color: colors.textSecondary }}>{t('settings.dataSection')}</Text>
         <ClearDataSection onClear={handleClearData} />
+      </View>
+
+      <View style={{ gap: spacing.sm }}>
+        <Text style={{ ...typography.caption, color: colors.textSecondary }}>{t('settings.legalSection')}</Text>
+        <SettingsLinkRow
+          icon={<IconShieldLock size={sizes.iconDecorative} color={colors.primary} />}
+          title={t('settings.privacyPolicy')}
+          onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+        />
+        <SettingsLinkRow
+          icon={<IconFileText size={sizes.iconDecorative} color={colors.primary} />}
+          title={t('settings.termsOfService')}
+          onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
+        />
       </View>
 
       <Pressable
