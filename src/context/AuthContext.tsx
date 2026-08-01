@@ -10,7 +10,7 @@ type AuthContextValue = {
   token: string | null;
   loading: boolean;
   signup: (email: string, password: string, role: UserRole, licenseDocumentBase64?: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   applySession: (token: string, user: AuthUser) => Promise<void>;
 };
@@ -51,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function login(email: string, password: string) {
     const { token: nextToken, user: nextUser } = await apiLogin(email, password);
     await persist(nextToken, nextUser);
+    return nextUser;
   }
 
   async function logout() {

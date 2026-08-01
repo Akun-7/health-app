@@ -31,8 +31,11 @@ export default function LoginScreen({ navigation }: Props) {
     setError('');
     setLoading(true);
     try {
-      await login(email.trim(), password);
-      navigation.reset({ index: 0, routes: [{ name: profile ? 'Dashboard' : 'ProfileSetup' }] });
+      const nextUser = await login(email.trim(), password);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: nextUser.role === 'doctor' ? 'DoctorInbox' : profile ? 'Dashboard' : 'ProfileSetup' }],
+      });
     } catch (err) {
       setError(err instanceof ApiError ? t(apiErrorKey[err.code]) : t('auth.networkError'));
     } finally {
