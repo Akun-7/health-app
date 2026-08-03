@@ -20,6 +20,7 @@ import ClearDataSection from '../components/ClearDataSection';
 import AccessibilityToggleRow from '../components/AccessibilityToggleRow';
 import { useSettings } from '../context/SettingsContext';
 import { useLocale } from '../context/LocaleContext';
+import type { Locale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
 import { useProfile } from '../context/ProfileContext';
 import { useAuth } from '../context/AuthContext';
@@ -31,10 +32,21 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
-// Only a Kyrgyz version exists so far — all three UI locales (ky/ru/en) point
-// here for now until ru/en translations of the legal pages are published.
-const PRIVACY_POLICY_URL = 'https://akun-7.github.io/health-app/privacy-policy.html';
-const TERMS_OF_SERVICE_URL = 'https://akun-7.github.io/health-app/terms-of-service.html';
+const LEGAL_PAGES_BASE_URL = 'https://akun-7.github.io/health-app';
+
+// Kyrgyz pages keep their original (unsuffixed) filenames since that URL was
+// already published before ru/en translations existed — renaming it would
+// break the link people may already have bookmarked/shared.
+const PRIVACY_POLICY_URL: Record<Locale, string> = {
+  ky: `${LEGAL_PAGES_BASE_URL}/privacy-policy.html`,
+  ru: `${LEGAL_PAGES_BASE_URL}/privacy-policy-ru.html`,
+  en: `${LEGAL_PAGES_BASE_URL}/privacy-policy-en.html`,
+};
+const TERMS_OF_SERVICE_URL: Record<Locale, string> = {
+  ky: `${LEGAL_PAGES_BASE_URL}/terms-of-service.html`,
+  ru: `${LEGAL_PAGES_BASE_URL}/terms-of-service-ru.html`,
+  en: `${LEGAL_PAGES_BASE_URL}/terms-of-service-en.html`,
+};
 
 export default function SettingsScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
@@ -188,12 +200,12 @@ export default function SettingsScreen({ navigation }: Props) {
         <SettingsLinkRow
           icon={<IconShieldLock size={sizes.iconDecorative} color={colors.primary} />}
           title={t('settings.privacyPolicy')}
-          onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+          onPress={() => Linking.openURL(PRIVACY_POLICY_URL[locale])}
         />
         <SettingsLinkRow
           icon={<IconFileText size={sizes.iconDecorative} color={colors.primary} />}
           title={t('settings.termsOfService')}
-          onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL)}
+          onPress={() => Linking.openURL(TERMS_OF_SERVICE_URL[locale])}
         />
       </View>
 
