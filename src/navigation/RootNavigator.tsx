@@ -4,6 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '../theme';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
+import { useOnboarding } from '../context/OnboardingContext';
+import { resolveHomeRoute } from './resolveHomeRoute';
+import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
@@ -25,6 +28,7 @@ import BluetoothScreen from '../screens/BluetoothScreen';
 import SleepScreen from '../screens/SleepScreen';
 
 export type RootStackParamList = {
+  Onboarding: undefined;
   Login: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
@@ -52,9 +56,10 @@ export default function RootNavigator() {
   const theme = useTheme();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
+  const { seen: onboardingSeen, loading: onboardingLoading } = useOnboarding();
   const navTheme = theme.scheme === 'dark' ? DarkTheme : DefaultTheme;
 
-  if (authLoading || profileLoading) {
+  if (authLoading || profileLoading || onboardingLoading) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.pageBackground }}>
         <ActivityIndicator color={theme.colors.primary} />
@@ -62,13 +67,7 @@ export default function RootNavigator() {
     );
   }
 
-  const initialRouteName = !user
-    ? 'Login'
-    : user.role === 'doctor'
-      ? 'DoctorInbox'
-      : !profile
-        ? 'ProfileSetup'
-        : 'Dashboard';
+  const initialRouteName = !onboardingSeen ? 'Onboarding' : resolveHomeRoute(user, profile);
 
   return (
     <NavigationContainer
@@ -85,6 +84,7 @@ export default function RootNavigator() {
       }}
     >
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRouteName}>
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />

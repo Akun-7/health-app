@@ -10,6 +10,7 @@ import {
   IconFileText,
   IconTextSize,
   IconContrast2,
+  IconInfoCircle,
 } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import ThemeModeSelector from '../components/ThemeModeSelector';
@@ -122,6 +123,14 @@ export default function SettingsScreen({ navigation }: Props) {
           </View>
           <IconPencil size={sizes.iconInline} color={colors.textMuted} />
         </Pressable>
+      </View>
+
+      <View style={{ gap: spacing.sm }}>
+        <SettingsLinkRow
+          icon={<IconInfoCircle size={sizes.iconDecorative} color={colors.primary} />}
+          title={t('settings.onboardingReplay')}
+          onPress={() => navigation.navigate('Onboarding')}
+        />
       </View>
 
       <View style={{ gap: spacing.sm }}>
