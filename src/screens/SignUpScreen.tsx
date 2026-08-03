@@ -82,6 +82,7 @@ export default function SignUpScreen({ navigation }: Props) {
               onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
+              testID="signup-email"
             />
             <TextField
               label={t('common.password')}
@@ -89,6 +90,7 @@ export default function SignUpScreen({ navigation }: Props) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              testID="signup-password"
             />
             {error ? (
               <Text style={{ ...typography.small, color: colors.danger }}>{error}</Text>
@@ -99,6 +101,7 @@ export default function SignUpScreen({ navigation }: Props) {
             <Pressable
               onPress={() => setIsDoctor((prev) => !prev)}
               style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}
+              testID="signup-doctor-toggle"
             >
               {isDoctor ? (
                 <IconSquareCheck size={20} color={colors.primary} />
@@ -119,6 +122,7 @@ export default function SignUpScreen({ navigation }: Props) {
                 <Text style={{ ...typography.small, color: colors.textSecondary }}>{t('signup.doctorDisclaimer')}</Text>
                 <Pressable
                   onPress={handlePickLicenseImage}
+                  testID="signup-license-picker"
                   style={{
                     height: 44,
                     borderRadius: radii.button,
@@ -145,7 +149,7 @@ export default function SignUpScreen({ navigation }: Props) {
           </View>
 
           <View style={{ gap: spacing.md }}>
-            <Button title={t('signup.submit')} onPress={handleSignUp} loading={loading} />
+            <Button title={t('signup.submit')} onPress={handleSignUp} loading={loading} testID="signup-submit" />
             <Button title={t('signup.haveAccount')} variant="secondary" onPress={() => navigation.navigate('Login')} />
           </View>
         </View>
