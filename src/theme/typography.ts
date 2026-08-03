@@ -8,7 +8,7 @@ export const weight = {
   medium: '500' as const,
 };
 
-export const typography = {
+const baseSizes = {
   h1: { fontSize: 22, fontWeight: weight.medium, lineHeight: 28 },
   h2: { fontSize: 18, fontWeight: weight.medium, lineHeight: 24 },
   h3: { fontSize: 16, fontWeight: weight.medium, lineHeight: 22 },
@@ -17,4 +17,20 @@ export const typography = {
   small: { fontSize: 11, fontWeight: weight.regular, lineHeight: 14 }, // Жеткиликтүүлүк: минимум чек
 };
 
-export type TypographyTokens = typeof typography;
+export type TypographyTokens = typeof baseSizes;
+
+// "Чоң тамга" жеткиликтүүлүк режими үчүн: бардык деңгээлдерди бирдей
+// коэффициентке чоңойтот (fontSize жана lineHeight пропорционалдуу).
+export function buildTypography(scale: number): TypographyTokens {
+  const entries = Object.entries(baseSizes).map(([key, token]) => [
+    key,
+    {
+      ...token,
+      fontSize: Math.round(token.fontSize * scale),
+      lineHeight: Math.round(token.lineHeight * scale),
+    },
+  ]);
+  return Object.fromEntries(entries) as TypographyTokens;
+}
+
+export const typography = baseSizes;

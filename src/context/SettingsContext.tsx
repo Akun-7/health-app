@@ -7,14 +7,18 @@ export type ThemeMode = 'system' | 'light' | 'dark';
 
 type Settings = {
   themeMode: ThemeMode;
+  largeText: boolean;
+  highContrast: boolean;
 };
 
-const defaultSettings: Settings = { themeMode: 'system' };
+const defaultSettings: Settings = { themeMode: 'system', largeText: false, highContrast: false };
 
 type SettingsContextValue = {
   settings: Settings;
   loading: boolean;
   setThemeMode: (mode: ThemeMode) => Promise<void>;
+  setLargeText: (value: boolean) => Promise<void>;
+  setHighContrast: (value: boolean) => Promise<void>;
 };
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -31,13 +35,27 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  async function setThemeMode(themeMode: ThemeMode) {
-    const next = { ...settings, themeMode };
+  async function persist(next: Settings) {
     setSettings(next);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   }
 
-  const value = useMemo(() => ({ settings, loading, setThemeMode }), [settings, loading]);
+  async function setThemeMode(themeMode: ThemeMode) {
+    await persist({ ...settings, themeMode });
+  }
+
+  async function setLargeText(largeText: boolean) {
+    await persist({ ...settings, largeText });
+  }
+
+  async function setHighContrast(highContrast: boolean) {
+    await persist({ ...settings, highContrast });
+  }
+
+  const value = useMemo(
+    () => ({ settings, loading, setThemeMode, setLargeText, setHighContrast }),
+    [settings, loading]
+  );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }

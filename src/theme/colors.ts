@@ -50,4 +50,49 @@ export const dark = {
   successBg: '#243016',
 };
 
+// Улгайган/начар көрүүчү колдонуучулар үчүн "Жогорку контраст" режими: тонго
+// боёлгон (pastel) фондор алынып салынат (алар негизги/семантикалык
+// текст менен WCAG AA чегине (4.5:1) жетпейт — мис. кадимки dangerBg
+// үстүндөгү danger fg ~2.8:1), анын ордуна таза ак/кара фон + так так
+// текст/чек ара колдонулат. Семантикалык маани дагы деле иконка/текст
+// боюнча айырмаланат (түс менен гана эмес), MedicalDisclaimer'деги
+// эрежеге дал келет.
+export const lightHighContrast = {
+  textPrimary: '#000000',
+  textSecondary: '#1A1A1A',
+  textMuted: '#444444',
+  border: '#000000',
+  surface: '#FFFFFF',
+  pageBackground: '#FFFFFF',
+  onPrimary: '#FFFFFF',
+  primary: '#0C447C',
+  primaryDark: '#062A4D',
+  primaryLight: '#D6E7F7',
+  danger: '#B00020',
+  dangerBg: '#FFFFFF',
+  warning: '#8A5A00',
+  warningBg: '#FFFFFF',
+  success: '#2E5E0A',
+  successBg: '#FFFFFF',
+};
+
+export const darkHighContrast = {
+  textPrimary: '#FFFFFF',
+  textSecondary: '#F0F0F0',
+  textMuted: '#CFCFCF',
+  border: '#FFFFFF',
+  surface: '#000000',
+  pageBackground: '#000000',
+  onPrimary: '#000000',
+  primary: '#66B2FF',
+  primaryDark: '#3E85C7',
+  primaryLight: '#001B33',
+  danger: '#FF6659',
+  dangerBg: '#000000',
+  warning: '#FFC24B',
+  warningBg: '#000000',
+  success: '#8BD44C',
+  successBg: '#000000',
+};
+
 export type ColorTokens = typeof light;

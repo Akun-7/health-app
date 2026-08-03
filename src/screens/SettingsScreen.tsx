@@ -8,12 +8,15 @@ import {
   IconMoon,
   IconShieldLock,
   IconFileText,
+  IconTextSize,
+  IconContrast2,
 } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import ThemeModeSelector from '../components/ThemeModeSelector';
 import LanguageSelector from '../components/LanguageSelector';
 import SettingsLinkRow from '../components/SettingsLinkRow';
 import ClearDataSection from '../components/ClearDataSection';
+import AccessibilityToggleRow from '../components/AccessibilityToggleRow';
 import { useSettings } from '../context/SettingsContext';
 import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
@@ -34,7 +37,7 @@ const TERMS_OF_SERVICE_URL = 'https://akun-7.github.io/health-app/terms-of-servi
 
 export default function SettingsScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
-  const { settings, setThemeMode } = useSettings();
+  const { settings, setThemeMode, setLargeText, setHighContrast } = useSettings();
   const { locale, setLocale, t } = useLocale();
   const { profile } = useProfile();
   const { logout } = useAuth();
@@ -141,6 +144,24 @@ export default function SettingsScreen({ navigation }: Props) {
       <View style={{ gap: spacing.sm }}>
         <Text style={{ ...typography.caption, color: colors.textSecondary }}>{t('settings.themeSection')}</Text>
         <ThemeModeSelector value={settings.themeMode} onChange={setThemeMode} />
+      </View>
+
+      <View style={{ gap: spacing.sm }}>
+        <Text style={{ ...typography.caption, color: colors.textSecondary }}>{t('settings.accessibilitySection')}</Text>
+        <AccessibilityToggleRow
+          icon={<IconTextSize size={sizes.iconDecorative} color={colors.primary} />}
+          title={t('accessibility.largeText')}
+          description={t('accessibility.largeTextDescription')}
+          value={settings.largeText}
+          onValueChange={setLargeText}
+        />
+        <AccessibilityToggleRow
+          icon={<IconContrast2 size={sizes.iconDecorative} color={colors.primary} />}
+          title={t('accessibility.highContrast')}
+          description={t('accessibility.highContrastDescription')}
+          value={settings.highContrast}
+          onValueChange={setHighContrast}
+        />
       </View>
 
       <View style={{ gap: spacing.sm }}>

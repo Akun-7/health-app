@@ -9,7 +9,7 @@ type Props = {
 };
 
 export default function VitalCard({ icon, label, value, tone }: Props) {
-  const { colors, typography, radii, spacing } = useTheme();
+  const { colors, typography, radii, spacing, highContrast } = useTheme();
   const toneColors = {
     danger: { fg: colors.danger, bg: colors.dangerBg },
     warning: { fg: colors.warning, bg: colors.warningBg },
@@ -24,6 +24,10 @@ export default function VitalCard({ icon, label, value, tone }: Props) {
         borderRadius: radii.card,
         padding: spacing.md,
         gap: spacing.xs,
+        // Жогорку контраст режиминде тон-фондор (dangerBg ж.б.) таза
+        // ак/кара болуп калат — карточканы бөлүп көрсөтүү үчүн чек ара кошулат.
+        borderWidth: highContrast ? 2 : 0,
+        borderColor: highContrast ? toneColors.fg : 'transparent',
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
