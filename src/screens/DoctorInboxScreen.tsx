@@ -7,6 +7,7 @@ import { useLocale } from '../context/LocaleContext';
 import { fetchThreads } from '../api/client';
 import type { ChatThread } from '../api/client';
 import { formatTime } from '../data/measurements';
+import GuestAccountRequired from '../components/GuestAccountRequired';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 
@@ -14,7 +15,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'DoctorInbox'>;
 
 export default function DoctorInboxScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, guestMode } = useAuth();
   const { t } = useLocale();
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const isVerified = user?.verificationStatus === 'approved';
@@ -33,6 +34,10 @@ export default function DoctorInboxScreen({ navigation }: Props) {
   async function handleLogout() {
     await logout();
     navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+  }
+
+  if (guestMode) {
+    return <GuestAccountRequired onCreateAccount={() => navigation.navigate('SignUp')} />;
   }
 
   if (!isVerified) {

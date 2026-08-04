@@ -2,6 +2,7 @@ import { View, Text, ScrollView, Pressable, Linking } from 'react-native';
 import {
   IconMenu2,
   IconLogout,
+  IconUserPlus,
   IconUser,
   IconPencil,
   IconAlertTriangle,
@@ -52,7 +53,7 @@ export default function SettingsScreen({ navigation }: Props) {
   const { settings, setThemeMode, setLargeText, setHighContrast } = useSettings();
   const { locale, setLocale, t } = useLocale();
   const { profile } = useProfile();
-  const { logout } = useAuth();
+  const { logout, guestMode } = useAuth();
   const { clearAll: clearMeasurements } = useMeasurements();
   const { clearAll: clearReminders } = useReminders();
   const { clearAll: clearReminderLog } = useReminderLog();
@@ -66,6 +67,13 @@ export default function SettingsScreen({ navigation }: Props) {
     // reset() targets the closest navigator (the Drawer), which doesn't know
     // about 'Login' — that's a root-stack route, so reset the parent instead.
     navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Login' }] });
+  }
+
+  function handleCreateAccount() {
+    // Guest's local data isn't touched here — it stays in AsyncStorage and
+    // gets pushed up to the cloud once SignUp gives them a real token (same
+    // "local data exists, push to server" sync path every context already has).
+    navigation.navigate('SignUp');
   }
 
   return (
@@ -213,7 +221,7 @@ export default function SettingsScreen({ navigation }: Props) {
       </View>
 
       <Pressable
-        onPress={handleLogout}
+        onPress={guestMode ? handleCreateAccount : handleLogout}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -225,8 +233,14 @@ export default function SettingsScreen({ navigation }: Props) {
           padding: spacing.md,
         }}
       >
-        <IconLogout size={sizes.iconInline} color={colors.textPrimary} />
-        <Text style={{ ...typography.body, color: colors.textPrimary }}>{t('settings.logout')}</Text>
+        {guestMode ? (
+          <IconUserPlus size={sizes.iconInline} color={colors.textPrimary} />
+        ) : (
+          <IconLogout size={sizes.iconInline} color={colors.textPrimary} />
+        )}
+        <Text style={{ ...typography.body, color: colors.textPrimary }}>
+          {guestMode ? t('login.createAccount') : t('settings.logout')}
+        </Text>
       </Pressable>
     </ScrollView>
   );

@@ -111,7 +111,7 @@ function MainDrawerNavigator() {
 
 export default function RootNavigator() {
   const theme = useTheme();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, guestMode } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const { seen: onboardingSeen, loading: onboardingLoading } = useOnboarding();
   const navTheme = theme.scheme === 'dark' ? DarkTheme : DefaultTheme;
@@ -127,7 +127,7 @@ export default function RootNavigator() {
     );
   }
 
-  const initialRouteName = !onboardingSeen ? 'Onboarding' : resolveHomeRoute(user, profile);
+  const initialRouteName = !onboardingSeen ? 'Onboarding' : resolveHomeRoute(user, profile, guestMode);
 
   return (
     <>

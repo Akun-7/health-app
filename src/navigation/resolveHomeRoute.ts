@@ -4,8 +4,15 @@ import type { RootStackParamList } from './RootNavigator';
 
 // Shared by RootNavigator's initial route and OnboardingScreen's "done" step
 // so the two never drift on where a given user/profile combo should land.
-export function resolveHomeRoute(user: AuthUser | null, profile: Profile | null): keyof RootStackParamList {
-  if (!user) return 'Login';
+export function resolveHomeRoute(
+  user: AuthUser | null,
+  profile: Profile | null,
+  guestMode = false
+): keyof RootStackParamList {
+  if (!user) {
+    if (guestMode) return profile ? 'Main' : 'ProfileSetup';
+    return 'Login';
+  }
   if (user.role === 'doctor') return 'DoctorInbox';
   if (!profile) return 'ProfileSetup';
   return 'Main';

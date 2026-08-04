@@ -25,7 +25,7 @@ export default function OnboardingScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
   const { t } = useLocale();
   const { markSeen } = useOnboarding();
-  const { user } = useAuth();
+  const { user, guestMode } = useAuth();
   const { profile } = useProfile();
   const [index, setIndex] = useState(0);
 
@@ -38,7 +38,7 @@ export default function OnboardingScreen({ navigation }: Props) {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.reset({ index: 0, routes: [{ name: resolveHomeRoute(user, profile) }] });
+      navigation.reset({ index: 0, routes: [{ name: resolveHomeRoute(user, profile, guestMode) }] });
     }
   }
 

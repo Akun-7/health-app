@@ -44,6 +44,10 @@ export const en: Record<TranslationKey, string> = {
   'login.createAccount': 'Create account',
   'login.forgotPassword': 'Forgot password?',
 
+  'guest.continueAsGuest': 'Continue as guest',
+  'guest.accountRequired': 'This feature requires an account',
+  'guest.dataWarning': 'Your data is stored only on this device and is not backed up to the cloud. If you lose this device or delete the app, the data cannot be recovered. Create an account to keep your data safe.',
+
   'signup.title': 'Create account',
   'signup.subtitle': 'Sign up to track your health',
   'signup.submit': 'Sign up',

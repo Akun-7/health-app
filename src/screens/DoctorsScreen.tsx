@@ -6,13 +6,14 @@ import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { fetchDoctors } from '../api/client';
 import type { DoctorSummary } from '../api/client';
+import GuestAccountRequired from '../components/GuestAccountRequired';
 import type { MainScreenProps } from '../navigation/RootNavigator';
 
 type Props = MainScreenProps<'Doctors'>;
 
 export default function DoctorsScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
-  const { token } = useAuth();
+  const { token, guestMode } = useAuth();
   const { t } = useLocale();
   const [doctors, setDoctors] = useState<DoctorSummary[]>([]);
 
@@ -26,6 +27,10 @@ export default function DoctorsScreen({ navigation }: Props) {
       cancelled = true;
     };
   }, [token]);
+
+  if (guestMode) {
+    return <GuestAccountRequired onCreateAccount={() => navigation.navigate('SignUp')} />;
+  }
 
   return (
     <ScrollView

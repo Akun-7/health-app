@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
-import { IconArrowLeft } from '@tabler/icons-react-native';
+import { IconArrowLeft, IconInfoCircle } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
 import type { Gender } from '../data/profile';
 import { useProfile } from '../context/ProfileContext';
+import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,6 +19,7 @@ const genderOptions: Gender[] = ['female', 'male'];
 export default function ProfileSetupScreen({ navigation, route }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
   const { profile, saveProfile } = useProfile();
+  const { guestMode } = useAuth();
   const { t } = useLocale();
   const isEdit = route.params?.mode === 'edit';
 
@@ -79,6 +81,24 @@ export default function ProfileSetupScreen({ navigation, route }: Props) {
             )}
             <Text style={{ ...typography.body, color: colors.textSecondary }}>{t('profileSetup.subtitle')}</Text>
           </View>
+
+          {guestMode && !isEdit ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: spacing.sm,
+                backgroundColor: colors.warningBg,
+                borderRadius: radii.card,
+                padding: spacing.md,
+              }}
+            >
+              <IconInfoCircle size={sizes.iconInline} color={colors.warning} />
+              <Text style={{ ...typography.caption, color: colors.textPrimary, flex: 1 }}>
+                {t('guest.dataWarning')}
+              </Text>
+            </View>
+          ) : null}
 
           <View style={{ gap: spacing.md }}>
             <View style={{ gap: spacing.xs }}>

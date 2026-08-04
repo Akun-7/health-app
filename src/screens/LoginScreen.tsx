@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export default function LoginScreen({ navigation }: Props) {
   const { colors, typography, spacing } = useTheme();
   const { t } = useLocale();
-  const { login } = useAuth();
+  const { login, enterGuestMode } = useAuth();
   const { profile } = useProfile();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,6 +41,11 @@ export default function LoginScreen({ navigation }: Props) {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleContinueAsGuest() {
+    await enterGuestMode();
+    navigation.reset({ index: 0, routes: [{ name: profile ? 'Main' : 'ProfileSetup' }] });
   }
 
   return (
@@ -91,6 +96,12 @@ export default function LoginScreen({ navigation }: Props) {
               onPress={() => navigation.navigate('SignUp')}
             />
           </View>
+
+          <Pressable onPress={handleContinueAsGuest} hitSlop={8} style={{ alignSelf: 'center' }}>
+            <Text style={{ ...typography.small, color: colors.textSecondary, textAlign: 'center' }}>
+              {t('guest.continueAsGuest')}
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

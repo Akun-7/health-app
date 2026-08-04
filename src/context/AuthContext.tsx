@@ -4,15 +4,18 @@ import { signup as apiSignup, login as apiLogin, fetchMe } from '../api/client';
 import type { AuthUser, UserRole } from '../api/client';
 
 const STORAGE_KEY = 'health-app/authToken';
+const GUEST_MODE_KEY = 'health-app/guestMode';
 
 type AuthContextValue = {
   user: AuthUser | null;
   token: string | null;
   loading: boolean;
+  guestMode: boolean;
   signup: (email: string, password: string, role: UserRole, licenseDocumentBase64?: string) => Promise<void>;
   login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   applySession: (token: string, user: AuthUser) => Promise<void>;
+  enterGuestMode: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -20,11 +23,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [guestMode, setGuestMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then(async (storedToken) => {
+    Promise.all([
+      AsyncStorage.getItem(STORAGE_KEY).then(async (storedToken) => {
         if (!storedToken) return;
         try {
           const { user: me } = await fetchMe(storedToken);
@@ -33,14 +37,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch {
           await AsyncStorage.removeItem(STORAGE_KEY);
         }
-      })
-      .finally(() => setLoading(false));
+      }),
+      AsyncStorage.getItem(GUEST_MODE_KEY).then((value) => setGuestMode(value === 'true')),
+    ]).finally(() => setLoading(false));
   }, []);
 
+  // A real signup/login always supersedes guest mode — otherwise logging out
+  // of a real account later would silently fall back into guest mode instead
+  // of showing Login, since the stale flag would still be in storage.
   async function persist(nextToken: string, nextUser: AuthUser) {
     await AsyncStorage.setItem(STORAGE_KEY, nextToken);
+    await AsyncStorage.removeItem(GUEST_MODE_KEY);
     setToken(nextToken);
     setUser(nextUser);
+    setGuestMode(false);
+  }
+
+  async function enterGuestMode() {
+    await AsyncStorage.setItem(GUEST_MODE_KEY, 'true');
+    setGuestMode(true);
   }
 
   async function signup(email: string, password: string, role: UserRole, licenseDocumentBase64?: string) {
@@ -65,8 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const value = useMemo(
-    () => ({ user, token, loading, signup, login, logout, applySession }),
-    [user, token, loading]
+    () => ({ user, token, loading, guestMode, signup, login, logout, applySession, enterGuestMode }),
+    [user, token, loading, guestMode]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

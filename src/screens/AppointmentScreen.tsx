@@ -7,13 +7,14 @@ import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { sendMyMessage } from '../api/client';
+import GuestAccountRequired from '../components/GuestAccountRequired';
 import type { MainScreenProps } from '../navigation/RootNavigator';
 
 type Props = MainScreenProps<'Appointment'>;
 
 export default function AppointmentScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
-  const { token } = useAuth();
+  const { token, guestMode } = useAuth();
   const { t } = useLocale();
   const [name, setName] = useState('');
   const [reason, setReason] = useState('');
@@ -37,6 +38,10 @@ export default function AppointmentScreen({ navigation }: Props) {
     setName('');
     setReason('');
     setWhen('');
+  }
+
+  if (guestMode) {
+    return <GuestAccountRequired onCreateAccount={() => navigation.navigate('SignUp')} />;
   }
 
   return (

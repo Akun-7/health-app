@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { fetchMyMessages, sendMyMessage, fetchPatientMessages, sendPatientMessage } from '../api/client';
 import type { ChatMessage } from '../api/client';
+import GuestAccountRequired from '../components/GuestAccountRequired';
 import type { MainScreenProps } from '../navigation/RootNavigator';
 
 type Props = MainScreenProps<'Chat'>;
@@ -15,7 +16,7 @@ const POLL_INTERVAL_MS = 3000;
 
 export default function ChatScreen({ navigation, route }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
-  const { user, token } = useAuth();
+  const { user, token, guestMode } = useAuth();
   const { t } = useLocale();
   const patientId = route.params?.patientId;
   const isDoctorView = Boolean(patientId);
@@ -54,6 +55,10 @@ export default function ChatScreen({ navigation, route }: Props) {
     setDraft('');
     setSending(false);
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+  }
+
+  if (guestMode && !isDoctorView) {
+    return <GuestAccountRequired onCreateAccount={() => navigation.navigate('SignUp')} />;
   }
 
   return (
