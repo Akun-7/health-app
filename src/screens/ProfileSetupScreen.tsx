@@ -40,7 +40,7 @@ export default function ProfileSetupScreen({ navigation, route }: Props) {
     if (isEdit) {
       navigation.goBack();
     } else {
-      navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
+      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
     }
   }
 

@@ -3,6 +3,8 @@ import Constants from 'expo-constants';
 import type { Measurement } from '../data/measurements';
 import type { Profile } from '../data/profile';
 import type { Reminder } from '../data/reminders';
+import type { Medication } from '../data/medications';
+import type { LabResult } from '../data/labResults';
 
 const API_PORT = 4000;
 
@@ -162,4 +164,34 @@ export function syncCloudReminders(token: string, reminders: Reminder[]) {
     body: { reminders },
     token,
   });
+}
+
+export function fetchCloudMedications(token: string) {
+  return request<{ medications: Medication[] }>('/api/data/medications', { token });
+}
+
+export function syncCloudMedications(token: string, medications: Medication[]) {
+  return request<{ medications: Medication[] }>('/api/data/medications', {
+    method: 'PUT',
+    body: { medications },
+    token,
+  });
+}
+
+export function fetchCloudLabResults(token: string) {
+  return request<{ labResults: LabResult[] }>('/api/data/labResults', { token });
+}
+
+export function syncCloudLabResults(token: string, labResults: LabResult[]) {
+  return request<{ labResults: LabResult[] }>('/api/data/labResults', {
+    method: 'PUT',
+    body: { labResults },
+    token,
+  });
+}
+
+export type DoctorSummary = { id: string; email: string };
+
+export function fetchDoctors(token: string) {
+  return request<{ doctors: DoctorSummary[] }>('/api/doctors', { token });
 }

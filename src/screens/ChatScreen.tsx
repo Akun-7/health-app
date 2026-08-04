@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
-import { IconArrowLeft, IconSend, IconInfoCircle } from '@tabler/icons-react-native';
+import { IconArrowLeft, IconMenu2, IconSend, IconInfoCircle } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import { useAuth } from '../context/AuthContext';
 import { useLocale } from '../context/LocaleContext';
 import { fetchMyMessages, sendMyMessage, fetchPatientMessages, sendPatientMessage } from '../api/client';
 import type { ChatMessage } from '../api/client';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
+import type { MainScreenProps } from '../navigation/RootNavigator';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Chat'>;
+type Props = MainScreenProps<'Chat'>;
 
 const POLL_INTERVAL_MS = 3000;
 
@@ -64,9 +63,13 @@ export default function ChatScreen({ navigation, route }: Props) {
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg, paddingBottom: spacing.sm }}>
         <Pressable
-          onPress={() => navigation.goBack()}
+          // Doctor view is pushed on top of the stack with a patientId param
+          // (from DoctorInbox) — goBack() makes sense there. The patient's
+          // own chat is a drawer root screen with no "back", so it opens the
+          // drawer instead, like every other drawer-hosted screen.
+          onPress={() => (isDoctorView ? navigation.goBack() : navigation.toggleDrawer())}
           hitSlop={8}
-          accessibilityLabel={t('common.back')}
+          accessibilityLabel={isDoctorView ? t('common.back') : t('nav.appName')}
           accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
@@ -79,7 +82,11 @@ export default function ChatScreen({ navigation, route }: Props) {
             borderColor: colors.border,
           }}
         >
-          <IconArrowLeft size={sizes.iconDecorative} color={colors.textPrimary} />
+          {isDoctorView ? (
+            <IconArrowLeft size={sizes.iconDecorative} color={colors.textPrimary} />
+          ) : (
+            <IconMenu2 size={sizes.iconDecorative} color={colors.textPrimary} />
+          )}
         </Pressable>
         <Text style={{ ...typography.h1, color: colors.textPrimary, flex: 1 }} numberOfLines={1}>
           {title}

@@ -65,6 +65,10 @@ export function listPendingDoctors(): User[] {
   return load().filter((u) => u.role === 'doctor' && u.verificationStatus === 'pending');
 }
 
+export function listApprovedDoctors(): User[] {
+  return load().filter((u) => u.role === 'doctor' && u.verificationStatus === 'approved');
+}
+
 export function setVerificationStatus(userId: string, status: VerificationStatus): User | undefined {
   const users = load();
   const user = users.find((u) => u.id === userId && u.role === 'doctor');

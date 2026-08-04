@@ -39,7 +39,7 @@ export default function ResetPasswordScreen({ navigation, route }: Props) {
     try {
       const { token, user } = await resetPassword(email.trim(), code.trim(), newPassword);
       await applySession(token, user);
-      navigation.reset({ index: 0, routes: [{ name: profile ? 'Dashboard' : 'ProfileSetup' }] });
+      navigation.reset({ index: 0, routes: [{ name: profile ? 'Main' : 'ProfileSetup' }] });
     } catch (err) {
       setError(err instanceof ApiError ? t(apiErrorKey[err.code]) : t('auth.networkError'));
     } finally {

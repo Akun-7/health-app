@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
-import { IconArrowLeft } from '@tabler/icons-react-native';
+import { IconMenu2 } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import MeasurementIcon from '../components/MeasurementIcon';
 import MedicalDisclaimer from '../components/MedicalDisclaimer';
@@ -9,10 +9,9 @@ import type { Measurement, Tone } from '../data/measurements';
 import { useMeasurements } from '../context/MeasurementsContext';
 import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
+import type { MainScreenProps } from '../navigation/RootNavigator';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'History'>;
+type Props = MainScreenProps<'History'>;
 
 type Section = { date: string; entries: Measurement[] };
 
@@ -47,9 +46,9 @@ export default function HistoryScreen({ navigation }: Props) {
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <Pressable
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.toggleDrawer()}
           hitSlop={8}
-          accessibilityLabel={t('common.back')}
+          accessibilityLabel={t('nav.appName')}
           accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
@@ -62,7 +61,7 @@ export default function HistoryScreen({ navigation }: Props) {
             borderColor: colors.border,
           }}
         >
-          <IconArrowLeft size={sizes.iconDecorative} color={colors.textPrimary} />
+          <IconMenu2 size={sizes.iconDecorative} color={colors.textPrimary} />
         </Pressable>
         <Text style={{ ...typography.h1, color: colors.textPrimary }}>{t('quickLink.history')}</Text>
       </View>

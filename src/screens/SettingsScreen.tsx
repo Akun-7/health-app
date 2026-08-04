@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Pressable, Linking } from 'react-native';
 import {
-  IconArrowLeft,
+  IconMenu2,
   IconLogout,
   IconUser,
   IconPencil,
@@ -27,10 +27,9 @@ import { useAuth } from '../context/AuthContext';
 import { useMeasurements } from '../context/MeasurementsContext';
 import { useReminders } from '../context/RemindersContext';
 import { useReminderLog } from '../context/ReminderLogContext';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
+import type { MainScreenProps } from '../navigation/RootNavigator';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
+type Props = MainScreenProps<'Settings'>;
 
 const LEGAL_PAGES_BASE_URL = 'https://akun-7.github.io/health-app';
 
@@ -64,7 +63,9 @@ export default function SettingsScreen({ navigation }: Props) {
 
   async function handleLogout() {
     await logout();
-    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    // reset() targets the closest navigator (the Drawer), which doesn't know
+    // about 'Login' — that's a root-stack route, so reset the parent instead.
+    navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Login' }] });
   }
 
   return (
@@ -74,9 +75,9 @@ export default function SettingsScreen({ navigation }: Props) {
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <Pressable
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.toggleDrawer()}
           hitSlop={8}
-          accessibilityLabel={t('common.back')}
+          accessibilityLabel={t('nav.appName')}
           accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
@@ -89,7 +90,7 @@ export default function SettingsScreen({ navigation }: Props) {
             borderColor: colors.border,
           }}
         >
-          <IconArrowLeft size={sizes.iconDecorative} color={colors.textPrimary} />
+          <IconMenu2 size={sizes.iconDecorative} color={colors.textPrimary} />
         </Pressable>
         <Text style={{ ...typography.h1, color: colors.textPrimary }}>{t('quickLink.settings')}</Text>
       </View>

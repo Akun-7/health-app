@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { View, Text, ScrollView, Pressable, Linking, Platform } from 'react-native';
 import * as SMS from 'expo-sms';
-import { IconArrowLeft, IconAlertTriangle } from '@tabler/icons-react-native';
+import { IconMenu2, IconAlertTriangle } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import Button from '../components/Button';
 import { useEmergencyContacts } from '../context/EmergencyContactsContext';
 import { useMeasurements } from '../context/MeasurementsContext';
 import { useLocale } from '../context/LocaleContext';
 import { buildSosMessage } from '../data/sos';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
+import type { MainScreenProps } from '../navigation/RootNavigator';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'SOS'>;
+type Props = MainScreenProps<'SOS'>;
 
 export default function SOSScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
@@ -47,9 +46,9 @@ export default function SOSScreen({ navigation }: Props) {
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <Pressable
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.toggleDrawer()}
           hitSlop={8}
-          accessibilityLabel={t('common.back')}
+          accessibilityLabel={t('nav.appName')}
           accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
@@ -62,7 +61,7 @@ export default function SOSScreen({ navigation }: Props) {
             borderColor: colors.border,
           }}
         >
-          <IconArrowLeft size={sizes.iconDecorative} color={colors.textPrimary} />
+          <IconMenu2 size={sizes.iconDecorative} color={colors.textPrimary} />
         </Pressable>
         <Text style={{ ...typography.h1, color: colors.textPrimary }}>{t('sos.title')}</Text>
       </View>

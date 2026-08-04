@@ -10,6 +10,7 @@ import type { AuthedRequest } from './authMiddleware';
 import { createChatRouter } from './chatRoutes';
 import { createDataRouter } from './dataRoutes';
 import { createAdminRouter } from './adminRoutes';
+import { createDoctorsRouter } from './doctorsRoutes';
 import { sendPasswordResetEmail } from './email';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -142,6 +143,7 @@ export function createApp() {
 
   app.use('/api/chat', createChatRouter());
   app.use('/api/data', createDataRouter());
+  app.use('/api/doctors', createDoctorsRouter());
   app.use(createAdminRouter());
 
   return app;

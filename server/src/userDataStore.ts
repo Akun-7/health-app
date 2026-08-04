@@ -8,10 +8,18 @@ export type UserData = {
   measurements: unknown[];
   profile: unknown;
   reminders: unknown[];
+  medications: unknown[];
+  labResults: unknown[];
 };
 
 const DB_PATH = dataFilePath('userData.json');
-const EMPTY_USER_DATA: UserData = { measurements: [], profile: null, reminders: [] };
+const EMPTY_USER_DATA: UserData = {
+  measurements: [],
+  profile: null,
+  reminders: [],
+  medications: [],
+  labResults: [],
+};
 
 function load(): Record<string, UserData> {
   if (!fs.existsSync(DB_PATH)) return {};
@@ -23,8 +31,11 @@ function save(all: Record<string, UserData>) {
   fs.writeFileSync(DB_PATH, JSON.stringify(all, null, 2));
 }
 
+// Spread over EMPTY_USER_DATA so records written before medications/labResults
+// existed (or the ephemeral disk still has a stale shape) don't come back
+// with those fields undefined.
 export function getUserData(userId: string): UserData {
-  return load()[userId] ?? EMPTY_USER_DATA;
+  return { ...EMPTY_USER_DATA, ...(load()[userId] ?? {}) };
 }
 
 export function setMeasurements(userId: string, measurements: unknown[]): unknown[] {
@@ -46,4 +57,18 @@ export function setReminders(userId: string, reminders: unknown[]): unknown[] {
   all[userId] = { ...(all[userId] ?? EMPTY_USER_DATA), reminders };
   save(all);
   return reminders;
+}
+
+export function setMedications(userId: string, medications: unknown[]): unknown[] {
+  const all = load();
+  all[userId] = { ...(all[userId] ?? EMPTY_USER_DATA), medications };
+  save(all);
+  return medications;
+}
+
+export function setLabResults(userId: string, labResults: unknown[]): unknown[] {
+  const all = load();
+  all[userId] = { ...(all[userId] ?? EMPTY_USER_DATA), labResults };
+  save(all);
+  return labResults;
 }

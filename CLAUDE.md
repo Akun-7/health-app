@@ -1,12 +1,12 @@
 @AGENTS.md
 
-# HealthTrack (health-app) — долбоордун контексти
+# Өмүр (health-app) — долбоордун контексти
 
 Бул файл ар бир сессияда автоматтык окулат. Максаты — Claude'го долбоордун учурдагы абалын, тандалган стекти жана эрежелерди кайра түшүндүрбөй эле берүү.
 
 ## Долбоор жөнүндө
 
-Аты: HealthTrack (папка аты: `health-app`)
+Аты: Өмүр (2026-08-04гө чейин "HealthTrack" болчу — толук деталь "Аты өзгөртүлдү жана drawer-навигация" бөлүмүндө; папка аты дагы деле `health-app`, EAS `slug` да өзгөргөн эмес)
 Түрү: Ден-соолук көрсөткүчтөрүн (кан басым, пульс, SpO2) кол менен киргизип, тарыхын көзөмөлдөгөн жана дары/эскертме коюлган мобилдик тиркеме.
 Тил: UI кыргызча/орусча/англисче — `src/i18n/` жана `LocaleContext` аркылуу (тандалган тил `health-app/locale` ачкычы менен `AsyncStorage`до сакталат, демейки — `ky`).
 Максаттуу колдонуучу: Кыргызстан/Орусиядагы орто жаштагы жана улгайган колдонуучулар.
@@ -16,11 +16,13 @@
 ## Тех стек (иш жүзүндө колдонулуп жаткан)
 
 - **Mobile:** Expo SDK ~54 (2026-07-25'тен баштап; мурун 57 эле, физикалык түзмөктөгү Expo Go'нун SDK 54'кө чейин гана колдогонуна байланыштуу түшүрүлдү), React Native 0.81, React 19.1, TypeScript
-- **Навигация:** `@react-navigation/native` + `native-stack` (v7) — бир гана `RootNavigator` (`src/navigation/RootNavigator.tsx`), stack ичинде экрандар: Login, SignUp, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth, Sleep. Баштапкы route `AuthContext`/`ProfileContext`нин `loading` бүткөндөн кийин эсептелет: `!user` → Login, `user.role === 'doctor'` → DoctorInbox (ProfileSetup/Dashboard такыр четтелет), `!profile` → ProfileSetup, экинчиси → Dashboard.
+- **Навигация:** `@react-navigation/native` + `native-stack` (v7) + `@react-navigation/drawer` (v7, 2026-08-04дөн баштап). `RootNavigator` (`src/navigation/RootNavigator.tsx`) — сырткы `Stack.Navigator`, анын ичинде `Main` аттуу бир screen катары ичке салынган `Drawer.Navigator` (12 бөлүм — толук деталь "Аты өзгөртүлдү жана drawer-навигация" бөлүмүндө). Сырткы stack'те калгандар: Onboarding, Login, SignUp, ForgotPassword, ResetPassword, ProfileSetup, Main, AddMeasurement, Insights, AddReminder, AddLabResult, AddMedication, EmergencyContacts, AddEmergencyContact, DoctorInbox, Bluetooth, Sleep, CameraHeartRate. Баштапкы route `AuthContext`/`ProfileContext`нин `loading` бүткөндөн кийин `resolveHomeRoute()` менен эсептелет: `!user` → Login, `user.role === 'doctor'` → DoctorInbox (ProfileSetup/Main такыр четтелет), `!profile` → ProfileSetup, экинчиси → Main (Drawer'дин биринчи экраны — Dashboard).
 - **State/сактоо:** React Context (`createContext`/`useContext`) ар бир домен үчүн өзүнчө provider, дайыма `@react-native-async-storage/async-storage` менен персистенттелет. `App.tsx` алардын баарын `ComposeProviders` (`src/context/ComposeProviders.tsx`) аркылуу бириктирет — провайдер саны көбөйүп, кол менен вложить кылуу окулбай калгандан кийин кошулган; жаны context кошсоңуз ошол массивге кош, кол менен JSX-вложить кылба:
   - `MeasurementsContext` → `health-app/measurements` (2026-07-26дан баштап cloud'го дагы синхрондошот жана `secureStorage` менен шифрленет — тиешелүү бөлүмдөрдү кара)
   - `ProfileContext` → `health-app/profile` (cloud sync + шифрлөө бар, жогорудагыдай эле)
   - `RemindersContext` → `health-app/reminders` (cloud sync + шифрлөө бар, notification'дор дагы эле локалдуу)
+  - `MedicationsContext` → `health-app/medications` (2026-08-04дөн баштап, `MeasurementsContext`дин так эле үлгүсү менен — cloud sync + шифрлөө, notification жок)
+  - `LabResultsContext` → `health-app/labResults` (2026-08-04дөн баштап, `MedicationsContext`ке окшош эле)
   - `ReminderLogContext` → `health-app/reminderLog` (дары/эскертме аткарылуу тарыхы: `taken`/`skipped` + убакыт; шифрленет, cloud sync жок)
   - `SettingsContext` → `health-app/settings`
   - `LocaleContext` → `health-app/locale`
@@ -74,7 +76,7 @@
 
 ## Cloud'го синхрондоштуруу (Measurements/Profile/Reminders, "Production readiness" #2)
 
-2026-07-26да ишке ашырылды: `MeasurementsContext`, `ProfileContext`, `RemindersContext` эми `AsyncStorage`ден тышкары Render'деги backend'ге дагы синхрондошот (`server/src/userDataStore.ts` — ар бир колдонуучунун `userId` боюнча бир JSON blob'до `{measurements, profile, reminders}` сактайт; `server/src/dataRoutes.ts` — `GET`/`PUT /api/data/{measurements,profile,reminders}`, `requireAuth` менен корголгон). Максат: телефон жоголсо/бузулса, ошол эле аккаунтка жаны түзмөктөн кирип тарыхты калыбына келтирүү.
+2026-07-26да ишке ашырылды: `MeasurementsContext`, `ProfileContext`, `RemindersContext` эми `AsyncStorage`ден тышкары Render'деги backend'ге дагы синхрондошот (`server/src/userDataStore.ts` — ар бир колдонуучунун `userId` боюнча бир JSON blob'до `{measurements, profile, reminders}` сактайт; `server/src/dataRoutes.ts` — `GET`/`PUT /api/data/{measurements,profile,reminders}`, `requireAuth` менен корголгон). Максат: телефон жоголсо/бузулса, ошол эле аккаунтка жаны түзмөктөн кирип тарыхты калыбына келтирүү. 2026-08-04тө ушул эле blob/маршрут схемасы `medications`/`labResults` талаалары менен кеңейтилди (`MedicationsContext`/`LabResultsContext` үчүн, `GET`/`PUT /api/data/{medications,labResults}`) — толук деталь "Аты өзгөртүлдү жана drawer-навигация" бөлүмүндө.
 
 **Синхрондоштуруу модели — атайылап жөнөкөй, толук эмес:**
 - Ар бир мутация (measurement кошуу, profile сактоо, reminder кошуу/өчүрүү/которуштуруу) локалдуу `AsyncStorage`ге жазылгандан кийин, дароо серверге да PUT жиберилет (fire-and-forget — ишке ашпай калса, унчукпай өткөрүлөт, локалдуу копия дагы деле туура болот).
@@ -209,6 +211,37 @@ Backend жагындагы дайын ошол эле "Cloud'го деплой �
 - `expo-camera` native модуль болгондуктан, бул функцияны чыныгы түзмөктө сынап көрүү үчүн **жаны EAS dev-client build талап кылынат** (`eas build --profile development` кайра иштетилиши керек) — колдонуучу муну өзү кийин жасайт.
 - Веб платформада (`Platform.OS === 'web'`) `expo-camera` жарым-жартылай иштейт (`getUserMedia` аркылуу), бирок flash/torch көзөмөлү жок (ноутбуктун камерасында) — функция веб'де маанисиз/иштебейт, бул атайылап бөгөттөлгөн эмес (graceful emes, жөн эле натыйжасыз болот).
 
+## Аты өзгөртүлдү жана drawer-навигация ("Өмүр" ребрендинги, 12 бөлүмдүү меню)
+
+2026-08-04тө ишке ашырылды: тиркеменин көрсөтүлүүчү аты "HealthTrack"тен **"Өмүр"**го өзгөртүлдү (`app.json`деги `expo.name`; `slug`/Android `package` өзгөргөн эмес — EAS проект байланышын үзбөө үчүн; `AsyncStorage`деги `health-app/*` ачкычтар да өзгөргөн эмес — колдонуучунун учурдагы дайыны бузулбашы үчүн). Drawer'дин `nav.appName` i18n ачкычы (үчөө тең "Өмүр" — proper noun, тилге которулбайт) drawer'дин башында көрсөтүлөт.
+
+Ошол эле күнү негизги навигация Dashboard'дун quick-link катарынан + Settings шилтемелеринен **12 бөлүмдүү side drawer**ге которулду:
+
+🏠 Башкы бет (Dashboard) · 👨‍⚕️ Дарыгерлер (жаны) · 📅 Кабыл алууга жазылуу (жаны) · 💬 Онлайн консультация (Chat) · 📋 Анализдер (жаны) · 💊 Дары-дармектер (жаны) · ❤️ Ден соолук көрсөткүчтөрү (History) · 📄 Медкарта (жаны) · 🚑 Тез жардам (SOS) · 🔔 Эскертмелер (Reminders) · 📚 Пайдалуу маалыматтар (жаны) · ⚙️ Профиль (Settings)
+
+**Архитектура:** `src/navigation/RootNavigator.tsx`деги сырткы `Stack.Navigator`га бир жаны `Stack.Screen name="Main"` кошулду — анын компоненти `MainDrawerNavigator` (`createDrawerNavigator<MainDrawerParamList>()`), ичинде жогорудагы 12 бөлүм `Drawer.Screen` катары катталган. `Dashboard`, `History`, `Reminders`, `Settings`, `SOS`, `Chat` мурунку `RootStackParamList`дан алынып, жаны `MainDrawerParamList`ге көчүрүлдү; калгандары (`AddMeasurement`, `Insights`, `AddReminder`, `AddLabResult`, `AddMedication`, `EmergencyContacts`, `AddEmergencyContact`, `DoctorInbox`, `Bluetooth`, `Sleep`, `CameraHeartRate`) сырткы stack'те калды — drawer-ичиндеги экрандан ушул "leaf" экрандарга `navigate()` чакырылса, React Navigation аны автоматтык түрдө ата-энелик navigator'го "бөлкат" кылат (bubbling), атайын код жазуунун кереги жок.
+
+**Типтөө:** `RootNavigator.tsx`деги `MainScreenProps<T extends keyof MainDrawerParamList>` жаны helper — `CompositeScreenProps<DrawerScreenProps<MainDrawerParamList,T>, NativeStackScreenProps<RootStackParamList>>`, эки навигатордун тең `navigate()`черин бирдей коопсуз кылат. Ар бир drawer-экран `type Props = MainScreenProps<'Dashboard'>;` түрүндө колдонот (мурунку `NativeStackScreenProps<RootStackParamList,'X'>`дин ордуна). `DoctorInboxScreen`деги дарыгердин `Chat`ка өтүү чакыруусу `navigation.navigate('Main', { screen: 'Chat', params: {...} })` болуп өзгөрдү (`NavigatorScreenParams<MainDrawerParamList>` — RootStackParamList'теги `Main` талаасынын типи).
+
+**Header/hamburger:** Тиркеме буга чейин эле `headerShown: false` менен ар бир экран өз header'ин кол менен тартчу (`RemindersScreen.tsx`/`SettingsScreen.tsx`деги үлгү). Ушул эле конвенция Drawer'де да сакталды: 5 эски drawer-экран (Dashboard, History, Reminders, Settings, SOS) + Chat'тын "артка жебеси" `IconMenu2` + `navigation.toggleDrawer()`гө алмаштырылды (Dashboard'до мурда эч кандай баскыч жок болчу — жаны кошулду). `ChatScreen` эки жол менен колдонулгандыктан (дарыгер тарабынан `patientId`менен pushed, же пациенттин өз drawer-экраны катары) — header баскычы `isDoctorView`гө жараша шарттуу: дарыгерге артка жебе (`goBack()`), пациентке hamburger (`toggleDrawer()`). Drawer-эмес экрандар (`AddMeasurement`, `AddReminder`, `Insights` ж.б.) өзгөргөн жок — алардын чыныгы артка жебеси мурункудай эле иштейт.
+
+**`SettingsScreen`деги logout эрежеси:** `navigation.reset({routes:[{name:'Login'}]})` мурда түз иштечү, эми Drawer ичинен чыгуу керек болгондуктан `navigation.getParent()?.reset(...)` колдонулат (`reset()` жакынкы navigator'го — б.а. Drawer'дин өзүнө — тиешелүү, ал эми `'Login'` сырткы stack'тин route'у).
+
+**`CustomDrawerContent`** (`src/navigation/CustomDrawerContent.tsx`, жаны, ~200 сапка жетпеш үчүн `RootNavigator.tsx`дан бөлүнгөн) — `DrawerContentScrollView` + 12 кол менен тизилген `DrawerItem`, ар бири `nav.*` i18n ачкычы менен котормо алат, `@tabler/icons-react-native`ден иконка, тандалган (`focused`) абалы `colors.primary`/`colors.primaryLight` токендери менен белгиленет.
+
+**Жаны 6 бөлүм (backend + frontend):**
+- **Дарыгерлер (`DoctorsScreen.tsx`)** — `GET /api/doctors` (жаны, `server/src/doctorsRoutes.ts`, `requireAuth`) `verificationStatus === 'approved'` дарыгерлерди `{id, email}` түрүндө кайтарат (лицензия сүрөтү жок). Пациент дарыгерди тандаганда, чыныгы per-doctor thread жок болгондуктан (бирдиктүү inbox модели — жогорудагы "Телемедицина" эскертүүсүн кара), жөн эле `Chat` экранына өтөт.
+- **Кабыл алууга жазылуу (`AppointmentScreen.tsx`)** — жаны backend эндпоинти жок, атайылап: форма (аты/себеби/каалаган убакыт, бардыгы эркин текст) толтурулуп жиберилгенде `appointment.messageTemplate` i18n калыбы менен бир билдирүүгө айландырылат да, учурдагы `sendMyMessage()` аркылуу пациенттин өз chat thread'ине жиберилет (📅 эмодзи менен башталат, сунуштар четке кагылбайт).
+- **Анализдер / Дары-дармектер (`LabResultsScreen`+`AddLabResultScreen`, `MedicationsScreen`+`AddMedicationScreen`)** — эки эгиз context (`LabResultsContext`, `MedicationsContext`), `MeasurementsContext`дин так эле үлгүсү (secureStorage + cloud reconcile, notification жок). Дайын: `LabResult = {id,name,value,createdAt}`, `Medication = {id,name,dosage,createdAt}`. Backend: `server/src/userDataStore.ts`теги `UserData`ге `medications`/`labResults` талаалары кошулду (`getUserData()` эски (2026-08-04гө чейинки) жазууларды `EMPTY_USER_DATA` менен merge кылат — ephemeral disk'те же локалдуу dev'де эски форматтагы `userData.json` жолуксаң да `undefined` эмес, бош массив кайтарат), `dataRoutes.ts`ке эки GET/PUT жуп кошулду.
+- **Медкарта (`MedicalRecordScreen.tsx`)** — жаны context/дайын файлы жок, таза-composition read-only экран: profile (SettingsScreen'деги так эле блок), ар бир өлчөө түрүнүн акыркысы (Dashboard'догу `latestFor()` үлгүсү), медикамент/анализ тизмелери, `MedicalDisclaimer`.
+- **Пайдалуу маалыматтар (`HealthTipsScreen.tsx`)** — 5 статикалык кеңеш-карточка (`healthTips.tip1..5Title/Body` i18n ачкычтары), context/дайын файлы жок (логика жок, премature abstraction болмок).
+
+**Жаны npm-көз карандылыктар:** `@react-navigation/drawer`, `react-native-gesture-handler`, `react-native-reanimated` (SDK54 версиялары `npx expo install` менен тартылды — reanimated v4.1.7 келди, мурунку reanimated v3'төн айырмаланып babel plugin'и `react-native-reanimated/plugin` эмес, `react-native-worklets/plugin`; бирок `babel-preset-expo` муну **өзү автоматтык аныктайт жана кошот** (`hasModule('react-native-worklets')` текшерүү), ошондуктан `babel.config.js`ге кол менен эч нерсе кошулган жок). `index.ts`теги биринчи сап `import 'react-native-gesture-handler';` болушу керек (side-effect, gesture-handler'дин талабы). `App.tsx`деги `ComposeProviders`го эң сырткы `GestureRoot` (жаны, `GestureHandlerRootView`ди ороп турган бир сапттык компонент) кошулду.
+
+✅ 2026-08-04тө локалдуу серверге каршы (production Render'ди `.env`ди убактылуу өчүрүп) чыныгы браузерде толук текшерилди: жаны пациент катталып (drawer'ге чейинки бардык экрандар — Onboarding→SignUp→ProfileSetup→Main), drawer 12 бөлүм менен ачылды (активдүү бөлүм so'з так туура белгиленди), Дарыгерлер бош-абал көрсөттү (эч ким ырасталган эмес), Кабыл алууга жазылуу формасы толтурулуп жөнөтүлдү да, билдирүү Онлайн консультацияда эмодзи-калыбы менен туура көрүндү, Анализдер/Дары-дармектерге бирден жазуу кошулуп тизмеде көрүндү, Медкарта экөөнү тең + profile'ды туура агрегациялады, барак жаңыртылганда (reload) баары сакталып калды (cloud sync иштээри ырасталды). Existing 75 Jest тест (70 health-app + 5 server) баары өтөт, эки жактан тең `tsc --noEmit` таза.
+
+⚠️ **Дагы эле жок:** жаны экрандардын эч бирине component/screen тести жазылган эмес (LoginScreen/SignUpScreen'деги сыяктуу — өзүнчө тапшырма). Дарыгер аккаунту менен `DoctorInbox`тон `Main`/`Chat`ка нестелген öтüü чыныгы браузерде текшерилген эмес (тек typecheck + код-деңгээлинде ырасталды — дарыгер каттоо+admin approve агымы бул сессияда убакыт чектөөсүнөн улам такыр текшерилген жок). Түзмөктө (Android/iOS) drawer'дин swipe-gesture'у (react-native-gesture-handler'дин негизги максаты) эч качан текшерилген эмес — веб'де swipe жок, тек hamburger баскычы аркылуу гана сыналды.
+
 ## Папка структурасы (иш жүзүндөгү)
 
 ```
@@ -228,12 +261,12 @@ health-app/
     sleep/           — sleepSampling.ts (background task definition + акселерометр өлчөө)
     camera/          — ppg.ts (камера-негизделген пульс өлчөө: JPEG декодировка + peak-detection BPM эсептөө, native'ге көз каранды эмес; ppg.test.ts бар)
     components/     — Button, TextField, VitalCard, MeasurementIcon, ReminderIcon, ReminderListItem, ThemeModeSelector, LanguageSelector, MedicalDisclaimer, SettingsLinkRow, ClearDataSection, AccessibilityToggleRow (чоң тамга/жогорку контраст toggle'дору), CircularGauge (SVG progress-ring), StreakRow (акыркы 7 күн)
-    context/         — MeasurementsContext, ProfileContext, RemindersContext (RemindersContext.test.tsx бар), ReminderLogContext, SettingsContext, LocaleContext, OnboardingContext, AuthContext, EmergencyContactsContext, BleContext, StepsContext, SleepContext, ComposeProviders
-    data/            — measurements.ts, profile.ts, reminders.ts, reminderLog.ts, insights.ts, emergencyContacts.ts, sos.ts, steps.ts, sleep.ts, streak.ts (типтер + форматтоо/эсептөө функциялары; көрсөтүлүүчү тексттер эмес — алар i18n'де; insights/sleep/reminderLog/streak'тин `*.test.ts` файлдары бар)
+    context/         — MeasurementsContext, ProfileContext, RemindersContext (RemindersContext.test.tsx бар), MedicationsContext, LabResultsContext (экөө да 2026-08-04, MeasurementsContext'тин үлгүсү менен), ReminderLogContext, SettingsContext, LocaleContext, OnboardingContext, AuthContext, EmergencyContactsContext, BleContext, StepsContext, SleepContext, ComposeProviders
+    data/            — measurements.ts, profile.ts, reminders.ts, reminderLog.ts, insights.ts, emergencyContacts.ts, sos.ts, steps.ts, sleep.ts, streak.ts, medications.ts, labResults.ts (жаны, 2026-08-04) (типтер + форматтоо/эсептөө функциялары; көрсөтүлүүчү тексттер эмес — алар i18n'де; insights/sleep/reminderLog/streak'тин `*.test.ts` файлдары бар)
     i18n/            — ky.ts (канондук), ru.ts, en.ts
-    navigation/       — RootNavigator.tsx, resolveHomeRoute.ts (user/profile боюнча Login/DoctorInbox/ProfileSetup/Dashboard тандайт, RootNavigator да OnboardingScreen да колдонот)
+    navigation/       — RootNavigator.tsx (RootStackParamList + MainDrawerParamList + MainScreenProps<T>, сырткы Stack ичинде "Main" аттуу Drawer.Navigator), resolveHomeRoute.ts (user/profile боюнча Login/DoctorInbox/ProfileSetup/Main тандайт, RootNavigator да OnboardingScreen да колдонот), CustomDrawerContent.tsx (жаны, 12 бөлүмдүү drawer менюсунун мазмуну)
     notifications/    — reminderNotifications.ts, thresholdAlerts.ts
-    screens/          — Onboarding (биринчи ачылуудагы 4-беттик тааныштыруу), Login (LoginScreen.test.tsx бар), SignUp (SignUpScreen.test.tsx бар), ForgotPassword, ResetPassword, ProfileSetup, Dashboard, AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth, Sleep, CameraHeartRate (камера менен PPG пульс өлчөө)
+    screens/          — Onboarding (биринчи ачылуудагы 4-беттик тааныштыруу), Login (LoginScreen.test.tsx бар), SignUp (SignUpScreen.test.tsx бар), ForgotPassword, ResetPassword, ProfileSetup, Dashboard, Doctors, Appointment, LabResults, AddLabResult, Medications, AddMedication, MedicalRecord, HealthTips (алтоо тең жаны, 2026-08-04), AddMeasurement, History, Insights, Reminders, AddReminder, Settings, SOS, EmergencyContacts, AddEmergencyContact, Chat, DoctorInbox, Bluetooth, Sleep, CameraHeartRate (камера менен PPG пульс өлчөө)
     storage/          — secureStorage.ts (AsyncStorage'ди AES-шифрлөө менен ороп турган wrapper)
     theme/            — colors (light/dark + lightHighContrast/darkHighContrast), typography (buildTypography(scale), typography.test.ts бар), spacing, radii, ThemeProvider
   server/            — локалдуу Express auth+chat сервери (өз package.json'у, health-app'тин ичине кирбейт)
@@ -245,14 +278,15 @@ health-app/
       app.ts           — Express app + auth routes (signup/login/me/forgot-password/reset-password)
       authMiddleware.ts — requireAuth (app.ts менен chatRoutes.ts экөө тең колдонот)
       chatRoutes.ts     — /api/chat/* (requireDoctor гейт менен)
-      dataRoutes.ts      — /api/data/{measurements,profile,reminders} (GET/PUT, requireAuth менен)
+      dataRoutes.ts      — /api/data/{measurements,profile,reminders,medications,labResults} (GET/PUT, requireAuth менен; акыркы эки жуп 2026-08-04)
+      doctorsRoutes.ts   — /api/doctors (GET, жаны 2026-08-04, requireAuth менен — ырасталган дарыгерлердин {id,email} тизмеси)
       adminRoutes.ts     — /admin (HTML панель) + /api/admin/{pending-doctors,doctors/:id/verify} (ADMIN_TOKEN менен корголгон)
       auth.ts          — JWT sign/verify, production'до JWT_SECRET жоктон fail-fast; auth.test.ts бар
       email.ts          — Resend аркылуу сырсөз калыбына келтирүү коду жиберет (RESEND_API_KEY жок болсо консолго логдойт)
       dataDir.ts        — JSON-файлдардын жайгашкан жерин аныктайт (`DATA_DIR` env же дефолт `data/`)
-      userStore.ts      — users.json'го окуу/жазуу (role, resetCodeHash/resetCodeExpiresAt, verificationStatus/licenseDocumentBase64 талаалары менен)
+      userStore.ts      — users.json'го окуу/жазуу (role, resetCodeHash/resetCodeExpiresAt, verificationStatus/licenseDocumentBase64 талаалары менен; listApprovedDoctors() 2026-08-04)
       chatStore.ts      — messages.json'го окуу/жазуу
-      userDataStore.ts   — userData.json'го окуу/жазуу (userId боюнча measurements/profile/reminders blob)
+      userDataStore.ts   — userData.json'го окуу/жазуу (userId боюнча measurements/profile/reminders/medications/labResults blob)
 ```
 
 ## Дайын модели (учурда)
@@ -269,7 +303,7 @@ health-app/
 - TypeScript милдеттүү — `any` колдонбоо
 - Дизайн токендерин колдонуу — түстү/аралыкты түз жазбоо, `src/theme`ден алуу (мисалы `#185FA5` эмес, `theme.colors.primary`)
 - Ар бир context'тин өз `STORAGE_KEY`си бар, жаны context кошсоңуз `health-app/<домен>` форматын сакта
-- Жаны экран кошсоңуз `RootNavigator.tsx`деги `RootStackParamList`ге да кошуу керек
+- Жаны экран кошсоңуз, ал drawer'дин 12 бөлүмүнүн бири болобу же жокпу чечким кабыл ал: эгер ооба — `RootNavigator.tsx`деги `MainDrawerParamList`ге кош жана `type Props = MainScreenProps<'X'>` колдон (hamburger баскычы `IconMenu2`+`navigation.toggleDrawer()` менен); эгер жок (add/detail-сыяктуу "leaf" экран) — `RootStackParamList`ге кош, `NativeStackScreenProps<RootStackParamList,'X'>` колдон (чыныгы артка жебеси `IconArrowLeft`+`navigation.goBack()` менен)
 - Компонент өлчөмү — 200 сапттан ашпашы керек
 - Комментарий — татаал логикага гана
 - UI тексттерди экрандын/компоненттин ичине түз жазбоо — `src/i18n/ky.ts`ге ачкыч кош, `ru.ts`/`en.ts`ге котормосун да кош, экранда `useLocale()`дон алынган `t('namespace.key')` менен колдон. Жаны ачкыч кошсоң үчөө тең (ky/ru/en) бирге жаңылансын — `ru.ts`/`en.ts` `Record<TranslationKey, string>` болгондуктан бирөө жетишпесе TypeScript катачылык берет.

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
-import { IconArrowLeft, IconPlus, IconInfoCircle } from '@tabler/icons-react-native';
+import { IconMenu2, IconPlus, IconInfoCircle } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import ReminderIcon from '../components/ReminderIcon';
 import ReminderListItem from '../components/ReminderListItem';
@@ -11,10 +11,9 @@ import { useLocale } from '../context/LocaleContext';
 import type { TranslationKey } from '../i18n/ky';
 import { getReminderPermissionStatus, requestReminderPermissions } from '../notifications/reminderNotifications';
 import type { ReminderPermissionStatus } from '../notifications/reminderNotifications';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
+import type { MainScreenProps } from '../navigation/RootNavigator';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Reminders'>;
+type Props = MainScreenProps<'Reminders'>;
 
 export default function RemindersScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
@@ -42,9 +41,9 @@ export default function RemindersScreen({ navigation }: Props) {
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
           <Pressable
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.toggleDrawer()}
             hitSlop={8}
-            accessibilityLabel={t('common.back')}
+            accessibilityLabel={t('nav.appName')}
             accessibilityRole="button"
             style={{
               width: sizes.tapTargetMin,
@@ -57,7 +56,7 @@ export default function RemindersScreen({ navigation }: Props) {
               borderColor: colors.border,
             }}
           >
-            <IconArrowLeft size={sizes.iconDecorative} color={colors.textPrimary} />
+            <IconMenu2 size={sizes.iconDecorative} color={colors.textPrimary} />
           </Pressable>
           <Text style={{ ...typography.h1, color: colors.textPrimary }}>{t('quickLink.reminders')}</Text>
         </View>

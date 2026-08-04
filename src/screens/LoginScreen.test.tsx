@@ -42,7 +42,7 @@ describe('LoginScreen', () => {
     mockProfile = null;
   });
 
-  it('routes a doctor account straight to DoctorInbox, bypassing Dashboard/ProfileSetup', async () => {
+  it('routes a doctor account straight to DoctorInbox, bypassing Main/ProfileSetup', async () => {
     mockLogin.mockResolvedValue({ id: '1', email: 'doc@example.com', role: 'doctor', verificationStatus: 'approved' });
     const utils = renderLoginScreen();
 
@@ -55,7 +55,7 @@ describe('LoginScreen', () => {
     });
   });
 
-  it('routes a patient account with an existing profile to Dashboard', async () => {
+  it('routes a patient account with an existing profile to Main', async () => {
     mockProfile = { name: 'Aman' };
     mockLogin.mockResolvedValue({ id: '2', email: 'patient@example.com', role: 'patient', verificationStatus: null });
     const utils = renderLoginScreen();
@@ -65,7 +65,7 @@ describe('LoginScreen', () => {
     await waitFor(() => expect(utils.navigation.reset).toHaveBeenCalled());
     expect(utils.navigation.reset).toHaveBeenCalledWith({
       index: 0,
-      routes: [{ name: 'Dashboard' }],
+      routes: [{ name: 'Main' }],
     });
   });
 

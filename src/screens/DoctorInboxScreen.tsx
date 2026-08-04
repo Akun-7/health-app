@@ -100,7 +100,12 @@ export default function DoctorInboxScreen({ navigation }: Props) {
           {threads.map((thread, index) => (
             <Pressable
               key={thread.patientId}
-              onPress={() => navigation.navigate('Chat', { patientId: thread.patientId, patientEmail: thread.patientEmail })}
+              onPress={() =>
+                navigation.navigate('Main', {
+                  screen: 'Chat',
+                  params: { patientId: thread.patientId, patientEmail: thread.patientEmail },
+                })
+              }
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',

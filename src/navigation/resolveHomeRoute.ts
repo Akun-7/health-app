@@ -8,5 +8,5 @@ export function resolveHomeRoute(user: AuthUser | null, profile: Profile | null)
   if (!user) return 'Login';
   if (user.role === 'doctor') return 'DoctorInbox';
   if (!profile) return 'ProfileSetup';
-  return 'Dashboard';
+  return 'Main';
 }
