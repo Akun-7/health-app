@@ -46,6 +46,14 @@
         {
           "photosPermission": "Дарыгердин лицензия/диплом сүрөтүн тандоо үчүн галереяга мүмкүнчүлүк керек"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Манжаңыздагы пульсту камера аркылуу өлчөө үчүн камерага мүмкүнчүлүк керек",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "extra": {

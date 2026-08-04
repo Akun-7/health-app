@@ -80,6 +80,15 @@ export const ru: Record<TranslationKey, string> = {
 
   'dashboard.greeting': 'Привет!',
   'dashboard.subtitle': 'Ваши показатели за сегодня',
+  'dashboard.streak': 'Последние 7 дней',
+
+  'day.short.0': 'Вс',
+  'day.short.1': 'Пн',
+  'day.short.2': 'Вт',
+  'day.short.3': 'Ср',
+  'day.short.4': 'Чт',
+  'day.short.5': 'Пт',
+  'day.short.6': 'Сб',
 
   'quickLink.history': 'История',
   'quickLink.reminders': 'Напоминания',
@@ -129,6 +138,21 @@ export const ru: Record<TranslationKey, string> = {
   'bluetooth.waitingReading': 'Ожидание показателя...',
   'bluetooth.disconnect': 'Отключить',
   'bluetooth.saved': 'Сохранено',
+
+  'measurement.cameraOption': 'Измерить через камеру',
+  'camera.title': 'Измерение пульса через камеру',
+  'camera.instructions': 'Полностью закройте пальцем заднюю камеру и вспышку, затем нажмите «Начать».',
+  'camera.permissionRequired': 'Нужен доступ к камере',
+  'camera.grantPermission': 'Разрешить',
+  'camera.permissionDenied': 'Доступ к камере не предоставлен. Разрешите доступ в настройках устройства и попробуйте снова.',
+  'camera.start': 'Начать',
+  'camera.measuring': 'Измеряется...',
+  'camera.holdStill': 'Держите палец неподвижно, но не сильно надавливайте',
+  'camera.failed': 'Не удалось точно измерить. Проверьте, что палец полностью закрывает камеру и вспышку, и попробуйте снова.',
+  'camera.retry': 'Попробовать снова',
+  'camera.resultLabel': 'Примерный пульс',
+  'camera.save': 'Сохранить',
+  'camera.disclaimer': 'Это не измерение медицинского уровня — только приблизительная оценка через камеру. Для точного измерения используйте сертифицированный тонометр/пульсоксиметр.',
 
   'steps.title': 'Шаги',
 

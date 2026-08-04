@@ -80,6 +80,15 @@ export const en: Record<TranslationKey, string> = {
 
   'dashboard.greeting': 'Hello!',
   'dashboard.subtitle': "Today's readings",
+  'dashboard.streak': 'Last 7 days',
+
+  'day.short.0': 'Su',
+  'day.short.1': 'Mo',
+  'day.short.2': 'Tu',
+  'day.short.3': 'We',
+  'day.short.4': 'Th',
+  'day.short.5': 'Fr',
+  'day.short.6': 'Sa',
 
   'quickLink.history': 'History',
   'quickLink.reminders': 'Reminders',
@@ -129,6 +138,21 @@ export const en: Record<TranslationKey, string> = {
   'bluetooth.waitingReading': 'Waiting for a reading...',
   'bluetooth.disconnect': 'Disconnect',
   'bluetooth.saved': 'Saved',
+
+  'measurement.cameraOption': 'Measure with camera',
+  'camera.title': 'Camera pulse measurement',
+  'camera.instructions': 'Fully cover the back camera and flash with your finger, then tap "Start".',
+  'camera.permissionRequired': 'Camera access needed',
+  'camera.grantPermission': 'Grant permission',
+  'camera.permissionDenied': 'Camera access was not granted. Allow it in your device settings and try again.',
+  'camera.start': 'Start',
+  'camera.measuring': 'Measuring...',
+  'camera.holdStill': 'Hold your finger still, but don\'t press too hard',
+  'camera.failed': 'Could not get a clear reading. Check that your finger fully covers the camera and flash, then try again.',
+  'camera.retry': 'Try again',
+  'camera.resultLabel': 'Estimated pulse',
+  'camera.save': 'Save',
+  'camera.disclaimer': 'This is not a medical-grade measurement — just a rough camera-based estimate. Use a certified blood pressure monitor/pulse oximeter for an accurate reading.',
 
   'steps.title': 'Steps',
 

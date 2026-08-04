@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
-import { IconArrowLeft, IconBluetooth } from '@tabler/icons-react-native';
+import { IconArrowLeft, IconBluetooth, IconCamera } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
 import TextField from '../components/TextField';
 import Button from '../components/Button';
@@ -151,13 +151,22 @@ export default function AddMeasurementScreen({ navigation }: Props) {
             ) : null}
 
             {type === 'pulse' ? (
-              <TextField
-                label={t('measurement.pulseLabel')}
-                placeholder={t('measurement.pulsePlaceholder')}
-                value={pulse}
-                onChangeText={setPulse}
-                keyboardType="number-pad"
-              />
+              <View style={{ gap: spacing.sm }}>
+                <TextField
+                  label={t('measurement.pulseLabel')}
+                  placeholder={t('measurement.pulsePlaceholder')}
+                  value={pulse}
+                  onChangeText={setPulse}
+                  keyboardType="number-pad"
+                />
+                <Pressable
+                  onPress={() => navigation.navigate('CameraHeartRate')}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start' }}
+                >
+                  <IconCamera size={sizes.iconInline} color={colors.primary} />
+                  <Text style={{ ...typography.caption, color: colors.primary }}>{t('measurement.cameraOption')}</Text>
+                </Pressable>
+              </View>
             ) : null}
 
             {type === 'spo2' ? (

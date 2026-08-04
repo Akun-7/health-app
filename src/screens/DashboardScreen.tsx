@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { IconHistory, IconChartLine, IconBell, IconSettings, IconAlertTriangle, IconStethoscope, IconWalk } from '@tabler/icons-react-native';
 import { useTheme } from '../theme';
@@ -5,8 +6,12 @@ import VitalCard from '../components/VitalCard';
 import Button from '../components/Button';
 import MeasurementIcon from '../components/MeasurementIcon';
 import MedicalDisclaimer from '../components/MedicalDisclaimer';
-import { measurementMeta, formatMeasurementValue } from '../data/measurements';
-import type { MeasurementType } from '../data/measurements';
+import CircularGauge from '../components/CircularGauge';
+import StreakRow from '../components/StreakRow';
+import { measurementMeta, formatMeasurementValue, formatTime } from '../data/measurements';
+import type { Measurement, MeasurementType } from '../data/measurements';
+import { classify, insightTone } from '../data/insights';
+import { computeStreakDays } from '../data/streak';
 import { useMeasurements } from '../context/MeasurementsContext';
 import { useSteps } from '../context/StepsContext';
 import { useLocale } from '../context/LocaleContext';
@@ -16,7 +21,9 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
-const vitalTypes: MeasurementType[] = ['bloodPressure', 'pulse', 'spo2'];
+const secondaryVitalTypes: MeasurementType[] = ['bloodPressure', 'spo2'];
+const PULSE_GAUGE_MIN = 40;
+const PULSE_GAUGE_MAX = 160;
 
 export default function DashboardScreen({ navigation }: Props) {
   const { colors, typography, spacing, radii, sizes } = useTheme();
@@ -27,6 +34,11 @@ export default function DashboardScreen({ navigation }: Props) {
   function latestFor(type: MeasurementType) {
     return measurements.find((m) => m.type === type);
   }
+
+  const latestPulse = measurements.find((m): m is Extract<Measurement, { type: 'pulse' }> => m.type === 'pulse');
+  const pulseStatus = latestPulse ? classify(latestPulse) : null;
+  const pulseTone = pulseStatus ? insightTone[pulseStatus] : 'success';
+  const streakDays = useMemo(() => computeStreakDays(measurements), [measurements]);
 
   const quickLinks: {
     key: 'History' | 'Insights' | 'Reminders' | 'Chat';
@@ -41,7 +53,7 @@ export default function DashboardScreen({ navigation }: Props) {
 
   return (
     <ScrollView
-      style={{ backgroundColor: colors.pageBackground }}
+      style={{ backgroundColor: colors.dashboardBackground }}
       contentContainerStyle={{ padding: spacing.lg, gap: spacing.xl }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -75,9 +87,9 @@ export default function DashboardScreen({ navigation }: Props) {
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: radii.round,
-              backgroundColor: colors.surface,
+              backgroundColor: colors.cardElevated,
               borderWidth: 1,
-              borderColor: colors.border,
+              borderColor: colors.gaugeTrack,
             }}
           >
             <IconSettings size={sizes.iconDecorative} color={colors.textPrimary} />
@@ -85,8 +97,49 @@ export default function DashboardScreen({ navigation }: Props) {
         </View>
       </View>
 
+      <View style={{ backgroundColor: colors.cardElevated, borderRadius: radii.modal, padding: spacing.md, gap: spacing.md }}>
+        <Text style={{ ...typography.caption, color: colors.textSecondary }}>{t('dashboard.streak')}</Text>
+        <StreakRow days={streakDays} />
+      </View>
+
+      <View style={{ backgroundColor: colors.cardElevated, borderRadius: radii.modal, padding: spacing.md, gap: spacing.md }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+            <MeasurementIcon type="pulse" size={sizes.iconInline} color={colors.primary} />
+            <Text style={{ ...typography.caption, color: colors.textSecondary }}>{t('measurement.pulse')}</Text>
+          </View>
+          {latestPulse ? (
+            <Text style={{ ...typography.caption, color: colors.textMuted }}>{formatTime(latestPulse.createdAt)}</Text>
+          ) : null}
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
+          {latestPulse ? (
+            <CircularGauge
+              value={latestPulse.bpm}
+              min={PULSE_GAUGE_MIN}
+              max={PULSE_GAUGE_MAX}
+              unitLabel="BPM"
+              tone={pulseTone}
+              size={120}
+            />
+          ) : (
+            <View style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ ...typography.h1, color: colors.textMuted }}>—</Text>
+            </View>
+          )}
+          {pulseStatus ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, flex: 1 }}>
+              <View style={{ width: 8, height: 8, borderRadius: radii.round, backgroundColor: colors[pulseTone] }} />
+              <Text style={{ ...typography.body, color: colors[pulseTone] }}>
+                {t(`insights.status.${pulseStatus}` as TranslationKey)}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      </View>
+
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-        {vitalTypes.map((type) => {
+        {secondaryVitalTypes.map((type) => {
           const meta = measurementMeta[type];
           const latest = latestFor(type);
           const toneColor = colors[meta.tone];
@@ -120,10 +173,10 @@ export default function DashboardScreen({ navigation }: Props) {
       <View
         style={{
           flexDirection: 'row',
-          backgroundColor: colors.surface,
+          backgroundColor: colors.cardElevated,
           borderRadius: radii.card,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: colors.gaugeTrack,
         }}
       >
         {quickLinks.map((link, index) => (
@@ -136,7 +189,7 @@ export default function DashboardScreen({ navigation }: Props) {
               gap: spacing.xs,
               paddingVertical: spacing.md,
               borderLeftWidth: index === 0 ? 0 : 1,
-              borderLeftColor: colors.border,
+              borderLeftColor: colors.gaugeTrack,
             }}
           >
             {link.icon}

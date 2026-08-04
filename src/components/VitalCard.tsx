@@ -10,29 +10,23 @@ type Props = {
 
 export default function VitalCard({ icon, label, value, tone }: Props) {
   const { colors, typography, radii, spacing, highContrast } = useTheme();
-  const toneColors = {
-    danger: { fg: colors.danger, bg: colors.dangerBg },
-    warning: { fg: colors.warning, bg: colors.warningBg },
-    success: { fg: colors.success, bg: colors.successBg },
-  }[tone];
+  const toneColor = colors[tone];
 
   return (
     <View
       style={{
         flexBasis: '48%',
-        backgroundColor: toneColors.bg,
-        borderRadius: radii.card,
+        backgroundColor: colors.cardElevated,
+        borderRadius: radii.modal,
         padding: spacing.md,
         gap: spacing.xs,
-        // Жогорку контраст режиминде тон-фондор (dangerBg ж.б.) таза
-        // ак/кара болуп калат — карточканы бөлүп көрсөтүү үчүн чек ара кошулат.
-        borderWidth: highContrast ? 2 : 0,
-        borderColor: highContrast ? toneColors.fg : 'transparent',
+        borderWidth: highContrast ? 2 : 1,
+        borderColor: highContrast ? toneColor : colors.gaugeTrack,
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
         {icon}
-        <Text style={{ ...typography.caption, color: toneColors.fg }}>{label}</Text>
+        <Text style={{ ...typography.caption, color: toneColor }}>{label}</Text>
       </View>
       <Text style={{ ...typography.h1, color: colors.textPrimary }}>{value}</Text>
     </View>

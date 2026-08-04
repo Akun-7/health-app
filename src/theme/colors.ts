@@ -27,6 +27,12 @@ export const light = {
   surface: '#FFFFFF',
   pageBackground: '#F1EFE8',
   onPrimary: '#FFFFFF',
+  // Dashboard/gauge-only tokens (Elev8-style redesign, 2026-08-04). Kept
+  // separate from surface/pageBackground so the rest of the app's screens
+  // are unaffected — only DashboardScreen/VitalCard/CircularGauge use these.
+  dashboardBackground: '#EEF3FB',
+  cardElevated: '#FFFFFF',
+  gaugeTrack: '#DCE6F2',
   ...brand,
   ...semantic,
 };
@@ -48,6 +54,12 @@ export const dark = {
   warningBg: '#3B2E17',
   success: '#8BC24A',
   successBg: '#243016',
+  // Deliberately a cooler navy, distinct from the app's warm-neutral dark
+  // palette above — matches the reference design (Elev8 Pro) for the
+  // Dashboard specifically, per user request.
+  dashboardBackground: '#0E1B33',
+  cardElevated: '#1C2C4C',
+  gaugeTrack: '#2B3D63',
 };
 
 // Улгайган/начар көрүүчү колдонуучулар үчүн "Жогорку контраст" режими: тонго
@@ -74,6 +86,12 @@ export const lightHighContrast = {
   warningBg: '#FFFFFF',
   success: '#2E5E0A',
   successBg: '#FFFFFF',
+  // High contrast always wins over the Dashboard's decorative navy/tint —
+  // stays plain white with a black track so the gauge/cards keep the same
+  // WCAG guarantees as the rest of high-contrast mode.
+  dashboardBackground: '#FFFFFF',
+  cardElevated: '#FFFFFF',
+  gaugeTrack: '#000000',
 };
 
 export const darkHighContrast = {
@@ -93,6 +111,9 @@ export const darkHighContrast = {
   warningBg: '#000000',
   success: '#8BD44C',
   successBg: '#000000',
+  dashboardBackground: '#000000',
+  cardElevated: '#000000',
+  gaugeTrack: '#FFFFFF',
 };
 
 export type ColorTokens = typeof light;

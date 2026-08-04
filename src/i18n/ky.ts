@@ -79,6 +79,15 @@ export const ky = {
 
   'dashboard.greeting': 'Салам!',
   'dashboard.subtitle': 'Бүгүнкү көрсөткүчтөрүңүз',
+  'dashboard.streak': 'Акыркы 7 күн',
+
+  'day.short.0': 'Жек',
+  'day.short.1': 'Дүй',
+  'day.short.2': 'Шей',
+  'day.short.3': 'Шар',
+  'day.short.4': 'Бей',
+  'day.short.5': 'Жум',
+  'day.short.6': 'Ише',
 
   'quickLink.history': 'Тарых',
   'quickLink.reminders': 'Эскертмелер',
@@ -128,6 +137,21 @@ export const ky = {
   'bluetooth.waitingReading': 'Көрсөткүч күтүлүүдө...',
   'bluetooth.disconnect': 'Ажыратуу',
   'bluetooth.saved': 'Сакталды',
+
+  'measurement.cameraOption': 'Камера менен өлчөө',
+  'camera.title': 'Камера менен пульс өлчөө',
+  'camera.instructions': 'Манжаңызды арткы камеранын жана flash\'тын үстүнө толук жаап коюңуз, андан кийин "Баштоо" басыңыз.',
+  'camera.permissionRequired': 'Камерага мүмкүнчүлүк керек',
+  'camera.grantPermission': 'Уруксат берүү',
+  'camera.permissionDenied': 'Камерага уруксат берилген жок. Түзмөктүн жөндөөлөрүнөн уруксат берип, кайра аракет кылыңыз.',
+  'camera.start': 'Баштоо',
+  'camera.measuring': 'Өлчөнүүдө...',
+  'camera.holdStill': 'Манжаңызды жылдырбай, бирок катуу эмес жаап кармаңыз',
+  'camera.failed': 'Так өлчөнгөн жок. Манжаңыз камера менен flash\'ты толук жаап тургандыгын текшерип, кайра аракет кылыңыз.',
+  'camera.retry': 'Кайра аракет кылуу',
+  'camera.resultLabel': 'Болжолдуу пульс',
+  'camera.save': 'Сактоо',
+  'camera.disclaimer': 'Бул медициналык деңгээлдеги өлчөө эмес — камера аркылуу болжолдуу баа гана. Так өлчөө үчүн сертификацияланган тонометр/пульсоксиметр колдонуңуз.',
 
   'steps.title': 'Кадам',
 

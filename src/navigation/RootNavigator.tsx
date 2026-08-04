@@ -26,6 +26,7 @@ import ChatScreen from '../screens/ChatScreen';
 import DoctorInboxScreen from '../screens/DoctorInboxScreen';
 import BluetoothScreen from '../screens/BluetoothScreen';
 import SleepScreen from '../screens/SleepScreen';
+import CameraHeartRateScreen from '../screens/CameraHeartRateScreen';
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -48,6 +49,7 @@ export type RootStackParamList = {
   DoctorInbox: undefined;
   Bluetooth: undefined;
   Sleep: undefined;
+  CameraHeartRate: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -104,6 +106,7 @@ export default function RootNavigator() {
         <Stack.Screen name="DoctorInbox" component={DoctorInboxScreen} />
         <Stack.Screen name="Bluetooth" component={BluetoothScreen} />
         <Stack.Screen name="Sleep" component={SleepScreen} />
+        <Stack.Screen name="CameraHeartRate" component={CameraHeartRateScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
