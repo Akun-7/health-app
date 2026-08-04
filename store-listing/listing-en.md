@@ -8,7 +8,7 @@ Track blood pressure, pulse & SpO2 — reminders, history, SOS
 
 ## Full description (max 4000 characters)
 
-HealthTrack is a simple app for self-monitoring blood pressure, pulse, and SpO2 (blood oxygen level).
+Өмүр is a simple app for self-monitoring blood pressure, pulse, and SpO2 (blood oxygen level).
 
 **Key features:**
 • Enter readings manually or via Bluetooth (blood pressure monitor/pulse oximeter)
@@ -21,7 +21,7 @@ HealthTrack is a simple app for self-monitoring blood pressure, pulse, and SpO2 
 • Large text and high-contrast modes — for users with low vision
 • Your medical data is encrypted on-device (AES) and backed up to the cloud (so it can be recovered if you lose your device)
 
-**⚠️ Important disclaimer:** HealthTrack is not a medical diagnostic or treatment device. All information in the app is for general informational purposes only and does not replace advice from a doctor. Always consult a qualified doctor before making decisions about your health. The "doctor" registration in the app is not verified against any license — it is not an official telemedicine service, just an experimental feature.
+**⚠️ Important disclaimer:** Өмүр is not a medical diagnostic or treatment device. All information in the app is for general informational purposes only and does not replace advice from a doctor. Always consult a qualified doctor before making decisions about your health. The "doctor" registration in the app is not verified against any license — it is not an official telemedicine service, just an experimental feature.
 
 The app does not show ads and does not use tools that track user behavior.
 
