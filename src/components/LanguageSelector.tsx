@@ -21,6 +21,9 @@ export default function LanguageSelector({ value, onChange }: Props) {
           <Pressable
             key={locale}
             onPress={() => onChange(locale)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            accessibilityLabel={localeNativeName[locale]}
             style={{
               flex: 1,
               alignItems: 'center',

@@ -67,6 +67,8 @@ export default function AddMeasurementScreen({ navigation }: Props) {
           <Pressable
             onPress={() => navigation.goBack()}
             hitSlop={8}
+            accessibilityLabel={t('common.back')}
+            accessibilityRole="button"
             style={{
               width: sizes.tapTargetMin,
               height: sizes.tapTargetMin,
@@ -101,6 +103,9 @@ export default function AddMeasurementScreen({ navigation }: Props) {
                   <Pressable
                     key={option.key}
                     onPress={() => setType(option.key)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    accessibilityLabel={t(`measurement.${option.key}` as TranslationKey)}
                     style={{
                       flex: 1,
                       gap: spacing.xs,

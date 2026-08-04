@@ -66,6 +66,8 @@ export default function ChatScreen({ navigation, route }: Props) {
         <Pressable
           onPress={() => navigation.goBack()}
           hitSlop={8}
+          accessibilityLabel={t('common.back')}
+          accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
             height: sizes.tapTargetMin,
@@ -135,6 +137,8 @@ export default function ChatScreen({ navigation, route }: Props) {
         <Pressable
           onPress={handleSend}
           disabled={sending || !draft.trim()}
+          accessibilityLabel={t('chat.send')}
+          accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
             height: sizes.tapTargetMin,

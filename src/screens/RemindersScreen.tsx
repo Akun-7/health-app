@@ -44,6 +44,8 @@ export default function RemindersScreen({ navigation }: Props) {
           <Pressable
             onPress={() => navigation.goBack()}
             hitSlop={8}
+            accessibilityLabel={t('common.back')}
+            accessibilityRole="button"
             style={{
               width: sizes.tapTargetMin,
               height: sizes.tapTargetMin,
@@ -62,6 +64,8 @@ export default function RemindersScreen({ navigation }: Props) {
         <Pressable
           onPress={() => navigation.navigate('AddReminder')}
           hitSlop={8}
+          accessibilityLabel={t('reminder.addTitle')}
+          accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
             height: sizes.tapTargetMin,

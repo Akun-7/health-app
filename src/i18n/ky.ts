@@ -2,6 +2,8 @@
 export const ky = {
   'common.save': 'Сактоо',
   'common.cancel': 'Жок',
+  'common.back': 'Артка',
+  'common.delete': 'Өчүрүү',
   'common.email': 'Email',
   'common.emailPlaceholder': 'you@example.com',
   'common.password': 'Сырсөз',

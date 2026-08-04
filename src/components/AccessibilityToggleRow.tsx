@@ -46,6 +46,7 @@ export default function AccessibilityToggleRow({ icon, title, description, value
         onValueChange={onValueChange}
         trackColor={{ false: colors.border, true: colors.primary }}
         thumbColor={colors.onPrimary}
+        accessibilityLabel={title}
       />
     </View>
   );

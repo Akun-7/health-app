@@ -15,6 +15,7 @@ export default function TextField({ label, error, style, onFocus, onBlur, ...res
     <View style={{ gap: spacing.xs }}>
       {label ? <Text style={{ ...typography.caption, color: colors.textSecondary }}>{label}</Text> : null}
       <TextInput
+        accessibilityLabel={label}
         placeholderTextColor={colors.textMuted}
         onFocus={(e) => {
           setFocused(true);

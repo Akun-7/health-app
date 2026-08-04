@@ -102,6 +102,9 @@ export default function SignUpScreen({ navigation }: Props) {
               onPress={() => setIsDoctor((prev) => !prev)}
               style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}
               testID="signup-doctor-toggle"
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: isDoctor }}
+              accessibilityLabel={t('signup.doctorToggle')}
             >
               {isDoctor ? (
                 <IconSquareCheck size={20} color={colors.primary} />

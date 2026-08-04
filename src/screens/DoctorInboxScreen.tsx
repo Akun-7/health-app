@@ -68,6 +68,8 @@ export default function DoctorInboxScreen({ navigation }: Props) {
         <Pressable
           onPress={handleLogout}
           hitSlop={8}
+          accessibilityLabel={t('settings.logout')}
+          accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
             height: sizes.tapTargetMin,

@@ -14,6 +14,9 @@ export default function Button({ title, variant = 'primary', loading, disabled, 
   return (
     <Pressable
       disabled={disabled || loading}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={({ pressed }) => [
         {
           height: sizes.buttonHeight,

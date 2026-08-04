@@ -40,6 +40,8 @@ export default function BluetoothScreen({ navigation }: Props) {
         <Pressable
           onPress={() => navigation.goBack()}
           hitSlop={8}
+          accessibilityLabel={t('common.back')}
+          accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
             height: sizes.tapTargetMin,

@@ -23,6 +23,8 @@ export default function EmergencyContactsScreen({ navigation }: Props) {
           <Pressable
             onPress={() => navigation.goBack()}
             hitSlop={8}
+            accessibilityLabel={t('common.back')}
+            accessibilityRole="button"
             style={{
               width: sizes.tapTargetMin,
               height: sizes.tapTargetMin,
@@ -41,6 +43,8 @@ export default function EmergencyContactsScreen({ navigation }: Props) {
         <Pressable
           onPress={() => navigation.navigate('AddEmergencyContact')}
           hitSlop={8}
+          accessibilityLabel={t('emergencyContacts.addTitle')}
+          accessibilityRole="button"
           style={{
             width: sizes.tapTargetMin,
             height: sizes.tapTargetMin,
@@ -97,7 +101,9 @@ export default function EmergencyContactsScreen({ navigation }: Props) {
               <Pressable
                 onPress={() => deleteContact(contact.id)}
                 hitSlop={8}
-                style={{ width: sizes.iconDecorative, height: sizes.iconDecorative, alignItems: 'center', justifyContent: 'center' }}
+                accessibilityLabel={`${t('common.delete')}: ${contact.name}`}
+                accessibilityRole="button"
+                style={{ width: sizes.tapTargetMin, height: sizes.tapTargetMin, alignItems: 'center', justifyContent: 'center' }}
               >
                 <IconTrash size={sizes.iconInline} color={colors.textMuted} />
               </Pressable>

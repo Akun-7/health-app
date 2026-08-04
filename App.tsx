@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from './src/theme';
 import { SettingsProvider } from './src/context/SettingsContext';
 import { LocaleProvider } from './src/context/LocaleContext';
@@ -35,7 +34,6 @@ export default function App() {
       ]}
     >
       <RootNavigator />
-      <StatusBar style="auto" />
     </ComposeProviders>
   );
 }

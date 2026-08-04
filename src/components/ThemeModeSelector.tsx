@@ -29,6 +29,9 @@ export default function ThemeModeSelector({ value, onChange }: Props) {
           <Pressable
             key={option.key}
             onPress={() => onChange(option.key)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            accessibilityLabel={t(option.labelKey)}
             style={{
               flex: 1,
               gap: spacing.xs,

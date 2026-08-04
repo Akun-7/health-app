@@ -3,6 +3,8 @@ import type { TranslationKey } from './ky';
 export const ru: Record<TranslationKey, string> = {
   'common.save': 'Сохранить',
   'common.cancel': 'Нет',
+  'common.back': 'Назад',
+  'common.delete': 'Удалить',
   'common.email': 'Email',
   'common.emailPlaceholder': 'you@example.com',
   'common.password': 'Пароль',

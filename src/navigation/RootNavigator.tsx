@@ -1,4 +1,5 @@
 import { View, ActivityIndicator } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '../theme';
@@ -63,51 +64,57 @@ export default function RootNavigator() {
 
   if (authLoading || profileLoading || onboardingLoading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.pageBackground }}>
-        <ActivityIndicator color={theme.colors.primary} />
-      </View>
+      <>
+        <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.pageBackground }}>
+          <ActivityIndicator color={theme.colors.primary} />
+        </View>
+      </>
     );
   }
 
   const initialRouteName = !onboardingSeen ? 'Onboarding' : resolveHomeRoute(user, profile);
 
   return (
-    <NavigationContainer
-      theme={{
-        ...navTheme,
-        colors: {
-          ...navTheme.colors,
-          background: theme.colors.pageBackground,
-          card: theme.colors.surface,
-          text: theme.colors.textPrimary,
-          border: theme.colors.border,
-          primary: theme.colors.primary,
-        },
-      }}
-    >
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRouteName}>
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
-        <Stack.Screen name="Dashboard" component={DashboardScreen} />
-        <Stack.Screen name="AddMeasurement" component={AddMeasurementScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
-        <Stack.Screen name="Insights" component={InsightsScreen} />
-        <Stack.Screen name="Reminders" component={RemindersScreen} />
-        <Stack.Screen name="AddReminder" component={AddReminderScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="SOS" component={SOSScreen} />
-        <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
-        <Stack.Screen name="AddEmergencyContact" component={AddEmergencyContactScreen} />
-        <Stack.Screen name="Chat" component={ChatScreen} />
-        <Stack.Screen name="DoctorInbox" component={DoctorInboxScreen} />
-        <Stack.Screen name="Bluetooth" component={BluetoothScreen} />
-        <Stack.Screen name="Sleep" component={SleepScreen} />
-        <Stack.Screen name="CameraHeartRate" component={CameraHeartRateScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
+      <NavigationContainer
+        theme={{
+          ...navTheme,
+          colors: {
+            ...navTheme.colors,
+            background: theme.colors.pageBackground,
+            card: theme.colors.surface,
+            text: theme.colors.textPrimary,
+            border: theme.colors.border,
+            primary: theme.colors.primary,
+          },
+        }}
+      >
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRouteName}>
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+          <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="AddMeasurement" component={AddMeasurementScreen} />
+          <Stack.Screen name="History" component={HistoryScreen} />
+          <Stack.Screen name="Insights" component={InsightsScreen} />
+          <Stack.Screen name="Reminders" component={RemindersScreen} />
+          <Stack.Screen name="AddReminder" component={AddReminderScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="SOS" component={SOSScreen} />
+          <Stack.Screen name="EmergencyContacts" component={EmergencyContactsScreen} />
+          <Stack.Screen name="AddEmergencyContact" component={AddEmergencyContactScreen} />
+          <Stack.Screen name="Chat" component={ChatScreen} />
+          <Stack.Screen name="DoctorInbox" component={DoctorInboxScreen} />
+          <Stack.Screen name="Bluetooth" component={BluetoothScreen} />
+          <Stack.Screen name="Sleep" component={SleepScreen} />
+          <Stack.Screen name="CameraHeartRate" component={CameraHeartRateScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 }

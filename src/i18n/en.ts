@@ -3,6 +3,8 @@ import type { TranslationKey } from './ky';
 export const en: Record<TranslationKey, string> = {
   'common.save': 'Save',
   'common.cancel': 'No',
+  'common.back': 'Back',
+  'common.delete': 'Delete',
   'common.email': 'Email',
   'common.emailPlaceholder': 'you@example.com',
   'common.password': 'Password',

@@ -81,6 +81,8 @@ export default function DashboardScreen({ navigation }: Props) {
           <Pressable
             onPress={() => navigation.navigate('Settings')}
             hitSlop={8}
+            accessibilityLabel={t('quickLink.settings')}
+            accessibilityRole="button"
             style={{
               width: sizes.tapTargetMin,
               height: sizes.tapTargetMin,

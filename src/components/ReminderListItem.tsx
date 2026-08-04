@@ -44,12 +44,15 @@ export default function ReminderListItem({
           onValueChange={onToggle}
           trackColor={{ false: colors.border, true: colors.primary }}
           thumbColor={colors.onPrimary}
+          accessibilityLabel={title}
         />
         {onDelete ? (
           <Pressable
             onPress={onDelete}
             hitSlop={8}
-            style={{ width: sizes.iconDecorative, height: sizes.iconDecorative, alignItems: 'center', justifyContent: 'center' }}
+            accessibilityLabel={`${t('common.delete')}: ${title}`}
+            accessibilityRole="button"
+            style={{ width: sizes.tapTargetMin, height: sizes.tapTargetMin, alignItems: 'center', justifyContent: 'center' }}
           >
             <IconTrash size={sizes.iconInline} color={colors.textMuted} />
           </Pressable>
